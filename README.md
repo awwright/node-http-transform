@@ -54,10 +54,12 @@ const server = http.createServer(function(req, res) {
 	if(req.url!=='/'){
 		res.statusCode = 404;
 		res.end('404 Not Found');
+		return;
 	}
 	if(req.method!=='GET'){
 		res.statusCode = 501;
 		res.end('501 Not Implemented');
+		return;
 	}
 	createReadStream('README.md').pipe(new Markdown).pipe(res);
 });
