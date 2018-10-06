@@ -8,6 +8,8 @@ An extension of the Node.js Transform stream that additionally supports the HTTP
 Add a Content-Type to a ReadableStream:
 
 ```javascript
+const { createServer } = require('http');
+const { createReadStream } = require('fs');
 const { inherits } = require('util');
 const { ServerResponseTransform } = require('http-transform');
 const { markdown } = require( "markdown" );
@@ -20,7 +22,7 @@ function Markdown(){
 	this.push('<!DOCTYPE html>');
 	this.push('<html xmlns="http://www.w3.org/1999/xhtml" lang="en" dir="ltr">');
 	this.push('	<head>');
-	//this.push('		<meta charset="UTF-8" />');
+	this.push('		<meta charset="UTF-8" />');
 	this.push('		<title></title>');
 	this.push('		<meta name="description" content="" />');
 	this.push('	</head>');
@@ -47,6 +49,19 @@ Markdown.prototype._flush = function _flush(callback){
 	this.push('</html>');
 	callback();
 };
+
+const server = http.createServer(function(req, res) {
+	if(req.url!=='/'){
+		res.statusCode = 404;
+		res.end('404 Not Found');
+	}
+	if(req.method!=='GET'){
+		res.statusCode = 501;
+		res.end('501 Not Implemented');
+	}
+	createReadStream('README.md').pipe(new Markdown).pipe(res);
+});
+
 ```
 
 ## API
