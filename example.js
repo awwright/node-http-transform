@@ -1,13 +1,3 @@
-# http-transform
-
-An extension of the Node.js Transform stream that additionally supports the HTTP header interface.
-
-
-## Features
-
-Add a Content-Type to a ReadableStream:
-
-```javascript
 const http = require('http');
 const { createReadStream } = require('fs');
 const { inherits } = require('util');
@@ -62,16 +52,3 @@ const server = http.createServer(function(req, res) {
 	createReadStream('README.md').pipe(new MarkdownTransform).pipe(res);
 });
 server.listen(8080);
-```
-
-## API
-
-### ServerResponseTransform
-
-A subclass of the Node.js Transform that also transforms HTTP headers and status code.
-
-### PassThrough
-
-Accepts input and passes it to the write target(s).
-
-This can be used to convert a typical ReadableStream into one that produces HTTP headers.
