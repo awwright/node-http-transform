@@ -2,23 +2,22 @@
 const assert = require('assert');
 const ServerResponseTransform = require('..').ServerResponseTransform;
 const ServerResponseBuffer = require('./Buffer.js').ServerResponseBuffer;
-const { createReadStream } = require('fs');
 const { PassThrough } = require('stream');
 
 describe('Transform', function() {
 	it('methods', function(done) {
 		var t = new ServerResponseTransform({
-			transformHead: function(res){ console.log('transformHead'); return res; },
+			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){
-				console.log('transform');
+				// console.log('transform');
 				cb(null, data + '!');
 			},
 			flush: function(cb){
-				console.log('flush');
+				// console.log('flush');
 				cb();
 			},
 			final: function(cb){
-				console.log('final');
+				// console.log('final');
 				cb();
 			},
 		});
@@ -34,9 +33,12 @@ describe('Transform', function() {
 			final: function(cb){ cb(); },
 		});
 		var src = new PassThrough;
-		t.setHeader('Content-Type', 'application/ecmascript');
+		t.setHeader('Content-Type', 'text/plain');
 		var end = new ServerResponseBuffer;
 		end.on('finish', function(){
+			assert.deepEqual(end.headers, {
+				'content-type': 'text/plain',
+			});
 			assert.equal(end.body, 'test!');
 			done();
 		});
@@ -57,6 +59,7 @@ describe('Transform', function() {
 			assert.deepEqual(end.headers, {
 				'content-type': 'application/ecmascript',
 			});
+			assert.equal(end.body, 'test');
 			done();
 		});
 		src.end('test');
@@ -79,6 +82,7 @@ describe('Transform', function() {
 			assert.deepEqual(end.headers, {
 				'content-type': 'application/xml',
 			});
+			assert.equal(end.body, 'test');
 			done();
 		});
 		src.end('test');
@@ -106,6 +110,26 @@ describe('Transform', function() {
 			});
 			done();
 		});
+		src.end('test');
+		src.pipe(t).pipe(end);
+	});
+	it('read contents then set headers', function(done) {
+		var t = new ServerResponseTransform({
+			transformHead: function(res){ return res; },
+			transform: function(data, enc, cb){ cb(null); },
+			flush: function(cb){ this.setHeader('Content-Type', 'text/plain'); cb(null, 'Content'); },
+			final: function(cb){ cb(); },
+		});
+		var src = new PassThrough;
+		var end = new ServerResponseBuffer;
+		end.on('finish', function(){
+			assert.deepEqual(end.headers, {
+				'content-type': 'text/plain',
+			});
+			assert.deepEqual(end.body, 'Content');
+			done();
+		});
+		t.setHeader('Content-Type', 'text/css');
 		src.end('test');
 		src.pipe(t).pipe(end);
 	});
