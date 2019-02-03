@@ -65,6 +65,26 @@ describe('Transform', function() {
 		src.end('test');
 		src.pipe(t).pipe(end);
 	});
+	it('headers injection (array)', function(done) {
+		var t = new ServerResponseTransform({
+			transformHead: function(res){ return res; },
+			transform: function(data, enc, cb){ cb(null, data); },
+			flush: function(cb){ cb(); },
+			final: function(cb){ cb(); },
+		});
+		var src = new PassThrough;
+		t.setHeader('Link', ['<3>;rel=next', '<1>;rel=prev']);
+		var end = new ServerResponseBuffer;
+		end.on('finish', function(){
+			assert.deepEqual(end.headers, {
+				'link': ['<3>;rel=next', '<1>;rel=prev'],
+			});
+			assert.equal(end.body, 'test');
+			done();
+		});
+		src.end('test');
+		src.pipe(t).pipe(end);
+	});
 	it('headers transform immediate', function(done) {
 		var t = new ServerResponseTransform({
 			transformHead: function(res){
