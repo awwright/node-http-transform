@@ -182,5 +182,24 @@ describe('Transform', function() {
 		src.end('test');
 		src.pipe(t).pipe(ServerResponsePassThrough()).pipe(end);
 	});
+	it('setStatusCode (ServerResponsePassThrough)', function(done) {
+		var src = new ServerResponsePassThrough;
+		var ttt = new ServerResponseTransform({
+			transformHead: function(res){ return res; },
+			transform: function(data, enc, cb){ cb(null); },
+			flush: function(cb){ this.setStatusCode(204); this.setHeader('Content-Type', 'text/plain'); cb(null); },
+			final: function(cb){ cb(); },
+		});
+		var end = new ServerResponseBuffer;
+		end.on('finish', function(){
+			assert.equal(end.statusCode, 204);
+			assert.equal(end.getHeader('Content-Type'), 'text/plain');
+			done();
+		});
+		ttt.setHeader('Content-Type', 'text/css');
+		src.end('test');
+		src.pipe(ttt).pipe(ServerResponsePassThrough()).pipe(end);
+	});
+	// TODO: Verify errors after first body is written
 });
 
