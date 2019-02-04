@@ -2,6 +2,7 @@
 const assert = require('assert');
 const ServerResponseTransform = require('..').ServerResponseTransform;
 const ServerResponseBuffer = require('./Buffer.js').ServerResponseBuffer;
+const ServerResponsePassThrough = require('..').ServerResponsePassThrough;
 const { PassThrough } = require('stream');
 
 describe('Transform', function() {
@@ -146,12 +147,40 @@ describe('Transform', function() {
 			assert.deepEqual(end.headers, {
 				'content-type': 'text/plain',
 			});
+			assert(end.hasHeader('Content-Type'));
+			assert(end.hasHeader('content-type'));
+			assert(!end.hasHeader('contenttype'));
+			assert.equal(end.getHeader('Content-Type'), 'text/plain');
 			assert.deepEqual(end.body, 'Content');
 			done();
 		});
 		t.setHeader('Content-Type', 'text/css');
 		src.end('test');
 		src.pipe(t).pipe(end);
+	});
+	it('read contents then set headers (ServerResponsePassThrough)', function(done) {
+		var t = new ServerResponseTransform({
+			transformHead: function(res){ return res; },
+			transform: function(data, enc, cb){ cb(null); },
+			flush: function(cb){ this.setHeader('Content-Type', 'text/plain'); cb(null, 'Content'); },
+			final: function(cb){ cb(); },
+		});
+		var src = new ServerResponsePassThrough;
+		var end = new ServerResponseBuffer;
+		end.on('finish', function(){
+			assert.deepEqual(end.headers, {
+				'content-type': 'text/plain',
+			});
+			assert(end.hasHeader('Content-Type'));
+			assert(end.hasHeader('content-type'));
+			assert(!end.hasHeader('contenttype'));
+			assert.equal(end.getHeader('Content-Type'), 'text/plain');
+			assert.deepEqual(end.body, 'Content');
+			done();
+		});
+		t.setHeader('Content-Type', 'text/css');
+		src.end('test');
+		src.pipe(t).pipe(ServerResponsePassThrough()).pipe(end);
 	});
 });
 
