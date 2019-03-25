@@ -110,7 +110,7 @@ describe('Transform', function() {
 		src.pipe(t).pipe(end);
 	});
 	it('headers transform asynchronous', function() {
-		return;
+		return void this.skip();
 		var t = new ServerResponseTransform({
 			transformHead: function(res, cb){
 				setTimeout(function(){
