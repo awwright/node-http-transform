@@ -19,10 +19,10 @@ describe('ServerResponsePassThrough', function(){
 			assert.equal(iout.statusCode, 500);
 		});
 		it('statusMessage', function(){
-			iin.statusMessage = 500;
-			assert.equal(iin.statusMessage, 500);
+			iin.statusMessage = 'Server Error';
+			assert.equal(iin.statusMessage, 'Server Error');
 			iin.end();
-			assert.equal(iout.statusMessage, 500);
+			assert.equal(iout.statusMessage, 'Server Error');
 		});
 		it('hasHeader', function(){
 			iin.setHeader('Content-Type', 'text/plain');

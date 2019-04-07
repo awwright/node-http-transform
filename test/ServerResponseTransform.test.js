@@ -187,7 +187,7 @@ describe('Transform', function() {
 		var ttt = new ServerResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){ cb(null); },
-			flush: function(cb){ this.setStatusCode(204); this.setHeader('Content-Type', 'text/plain'); cb(null); },
+			flush: function(cb){ this.statusCode = 204; this.setHeader('Content-Type', 'text/plain'); cb(null); },
 			final: function(cb){ cb(); },
 		});
 		var end = new ServerResponseBuffer;
