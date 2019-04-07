@@ -12,6 +12,18 @@ describe('ServerResponsePassThrough', function(){
 			iout = new ServerResponsePassThrough;
 			iin.pipe(iout);
 		});
+		it('statusCode', function(){
+			iin.statusCode = 500;
+			assert.equal(iin.statusCode, 500);
+			iin.end();
+			assert.equal(iout.statusCode, 500);
+		});
+		it('statusMessage', function(){
+			iin.statusMessage = 500;
+			assert.equal(iin.statusMessage, 500);
+			iin.end();
+			assert.equal(iout.statusMessage, 500);
+		});
 		it('hasHeader', function(){
 			iin.setHeader('Content-Type', 'text/plain');
 			assert(iin.hasHeader('Content-Type'));
