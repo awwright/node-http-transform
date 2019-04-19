@@ -200,6 +200,49 @@ describe('Transform', function() {
 		src.end('test');
 		src.pipe(ttt).pipe(ServerResponsePassThrough()).pipe(end);
 	});
+	it('on headersReady', function(done) {
+		var data = 0;
+		var src = new ServerResponsePassThrough;
+		var ttt = new ServerResponseTransform({
+			transformHead: function(res){ return res; },
+			transform: function(data, enc, cb){ cb(null); },
+			flush: function(cb){ this.statusCode = 204; this.setHeader('Content-Type', 'text/plain'); cb(null); },
+			final: function(cb){ cb(); },
+		});
+		var end = new ServerResponseBuffer;
+		end.on('headersReady', function(){
+			assert.equal(end.statusCode, 204);
+			assert.equal(end.getHeader('Content-Type'), 'text/plain');
+			assert(!data);
+			done();
+		});
+		end.on('data', function(){
+			data++;
+		});
+		ttt.setHeader('Content-Type', 'text/css');
+		src.end('test');
+		src.pipe(ttt).pipe(ServerResponsePassThrough()).pipe(end);
+	});
+	it('headersReady', function() {
+		var data = 0;
+		var src = new ServerResponsePassThrough;
+		var ttt = new ServerResponseTransform({
+			transformHead: function(res){ return res; },
+			transform: function(data, enc, cb){ cb(null); },
+			flush: function(cb){ this.statusCode = 204; this.setHeader('Content-Type', 'text/plain'); cb(null); },
+			final: function(cb){ cb(); },
+		});
+		var end = new ServerResponseBuffer;
+		end.on('data', function(){
+			data++;
+		});
+		ttt.setHeader('Content-Type', 'text/css');
+		src.end('test');
+		src.pipe(ttt).pipe(ServerResponsePassThrough()).pipe(end);
+		return end.headersReady.then(function(){
+			assert(!data);
+		});
+	});
 	// TODO: Verify errors after first body is written
 });
 
