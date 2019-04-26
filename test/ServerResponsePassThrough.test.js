@@ -16,6 +16,13 @@ describe('ServerResponsePassThrough', function(){
 			iin.end();
 			assert.equal(iout.statusCode, 500);
 		});
+		it('addHeader', function(){
+			iin.addHeader('Link', '<http://example.com/a>');
+			iin.addHeader('link', '<http://example.com/b>');
+			assert.equal(iin.getHeader('Link').length, 2);
+			iin.end();
+			assert.equal(iout.getHeader('Link').length, 2);
+		});
 		it('statusMessage', function(){
 			iin.statusMessage = 'Server Error';
 			assert.equal(iin.statusMessage, 'Server Error');

@@ -70,8 +70,32 @@ server.listen(8080);
 
 A subclass of the Node.js Transform that also transforms HTTP headers and status code.
 
+Properties/methods:
+
+* headersReady - A promise that resolves when headers have been committed and are ready to be read
+
 ### PassThrough
 
 Accepts input and passes it to the write target(s).
 
 This can be used to convert a typical ReadableStream into one that produces HTTP headers.
+
+### Headers
+
+Headers is a simple container for HTTP headers. Its methods and properties are imported into ServerResponseTransform.
+
+Properties/methods, as implemented in Node.js:
+
+* statusCode
+* statusMessage
+* getHeader(name)
+* setHeader(name, value)
+* removeHeader(name)
+* getHeaderNames()
+* getHeaders()
+* hasHeader(name)
+
+Additional methods:
+
+* addHeader(name, value)
+* pipeHeaders(dst) - set status code/message, and call setHeader on supplied destination
