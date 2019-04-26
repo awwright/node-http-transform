@@ -1,7 +1,5 @@
 
 const assert = require('assert');
-const ServerResponseTransform = require('..').ServerResponseTransform;
-const ServerResponseBuffer = require('./Buffer.js').ServerResponseBuffer;
 const ServerResponsePassThrough = require('..').ServerResponsePassThrough;
 
 describe('ServerResponsePassThrough', function(){
@@ -49,6 +47,11 @@ describe('ServerResponsePassThrough', function(){
 			iin.end();
 			assert.equal(Object.keys(iin.getHeaders()).length, 1);
 			assert.equal(Object.keys(iout.getHeaders()).length, 1);
+		});
+		it('headersReady', function(){
+			iin.setHeader('Content-Type', 'text/plain');
+			iin.end();
+			return iout.headersReady;
 		});
 	});
 });
