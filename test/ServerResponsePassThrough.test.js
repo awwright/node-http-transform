@@ -1,6 +1,7 @@
 
 const assert = require('assert');
 const ServerResponsePassThrough = require('..').ServerResponsePassThrough;
+const PassThrough = require('stream').PassThrough;
 
 describe('ServerResponsePassThrough', function(){
 	describe('interface', function(){
@@ -59,6 +60,25 @@ describe('ServerResponsePassThrough', function(){
 			iin.setHeader('Content-Type', 'text/plain');
 			iin.end();
 			return iout.headersReady;
+		});
+	});
+	describe('pipe (merging streams)', function(){
+		it('statusCode', function(){
+			var iin = new ServerResponsePassThrough;
+			var stream = new PassThrough;
+			var iout = new ServerResponsePassThrough;
+			iin.statusCode = 404;
+			iin.setHeader('Content-Type', 'text/plain');
+			stream.pipe(iin);
+
+			stream.write('File contents');
+			stream.end();
+
+			iin.pipe(iout);
+
+			return iout.headersReady.then(function(){
+				assert.equal(iout.statusCode, 404);
+			});
 		});
 	});
 });
