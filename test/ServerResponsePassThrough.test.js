@@ -4,12 +4,12 @@ const ServerResponsePassThrough = require('..').ServerResponsePassThrough;
 const PassThrough = require('stream').PassThrough;
 
 describe('ServerResponsePassThrough', function(){
-	describe('interface', function(){
+	describe('pipeMessage', function(){
 		var iin, iout;
 		beforeEach(function(){
 			iin = new ServerResponsePassThrough;
 			iout = new ServerResponsePassThrough;
-			iin.pipe(iout);
+			iin.pipeMessage(iout);
 		});
 		it('statusCode', function(){
 			iin.statusCode = 500;
@@ -75,6 +75,46 @@ describe('ServerResponsePassThrough', function(){
 			iin.setHeader('Content-Type', 'text/plain');
 			iin.end();
 			return iout.headersReady;
+		});
+	});
+	describe('pipeBody', function(){
+		var iin, iout;
+		beforeEach(function(){
+			iin = new ServerResponsePassThrough;
+			iout = new ServerResponsePassThrough;
+			iin.pipeBody(iout);
+		});
+		it('statusCode', function(){
+			iin.statusCode = 500;
+			assert.equal(iin.statusCode, 500);
+			iin.end();
+			assert.equal(iout.statusCode, undefined);
+		});
+		it('addHeader', function(){
+			iin.addHeader('Link', '<http://example.com/a>');
+			iin.addHeader('link', '<http://example.com/b>');
+			iin.addHeader('link', '<http://example.com/c>');
+			assert.equal(iin.getHeader('Link').length, 3);
+			iin.end();
+			assert(!iout.hasHeader('Link'));
+		});
+		it('statusMessage', function(){
+			iin.statusMessage = 'Server Error';
+			assert.equal(iin.statusMessage, 'Server Error');
+			iin.end();
+			assert.equal(iout.statusMessage, '');
+		});
+		it('hasHeader', function(){
+			iin.setHeader('Content-Type', 'text/plain');
+			assert(iin.hasHeader('Content-Type'));
+			iin.end();
+			assert(!iout.hasHeader('Content-Type'));
+		});
+		it('getHeader', function(){
+			iin.setHeader('Content-Type', 'text/plain');
+			assert.equal(iin.getHeader('Content-Type'), 'text/plain');
+			iin.end();
+			assert.equal(iout.getHeader('Content-Type'), undefined);
 		});
 	});
 	describe('pipe (merging streams)', function(){
