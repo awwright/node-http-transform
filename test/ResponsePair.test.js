@@ -48,4 +48,37 @@ describe('makeResponsePair', function(){
 			clientReadableSide.on('end', done);
 		});
 	});
+	describe('serverWritableSide instanceof ServerResponse', function(){
+		it('unsigned short statusCode');
+		it('string statusMessage');
+		it('writeContinue()');
+		it('writeProcessing()');
+		it('writeHead()');
+	});
+	describe('serverWritableSide instanceof OutgoingMessage', function(){
+		it('setHeader(name, value)');
+		it('getHeader(name)');
+		it('getHeaderNames()');
+		it('getHeaders()');
+		it('hasHeader()');
+		it('removeHeader()');
+		it('write()');
+		it('addTrailers()');
+		it('end()');
+		it('flushHeaders()');
+		it('pipe()');
+	});
+	describe('clientReadableSide instanceof IncomingMessage', function(){
+		it('rawTrailers');
+		it('trailers');
+		it('statusCode');
+		it('statusMessage');
+		it('url');
+		it('httpVersion');
+		it('headers');
+		it('complete');
+		it('aborted');
+		it('setTimeout(msecs, callback)');
+		it('destroy(error)');
+	});
 });
