@@ -23,8 +23,8 @@ describe('makeRequestPair', function(){
 			assert.strictEqual(serverReadableSide.hasHeader('Content-Type'), true);
 			assert.strictEqual(serverReadableSide.getHeader('Content-Type'), 'text/plain; charset=UTF-8');
 		});
-		it('removeHeader is read by server', function(){
-			assert.strictEqual(clientWritableSide.hasHeader('Date'), true);
+		it.skip('removeHeader is read by server', function(done){
+			// assert.strictEqual(clientWritableSide.hasHeader('Date'), true);
 			clientWritableSide.removeHeader('Date');
 			assert.strictEqual(serverReadableSide.hasHeader('Date'), true);
 		});
@@ -32,7 +32,7 @@ describe('makeRequestPair', function(){
 			clientWritableSide.end('x');
 			assert.strictEqual(serverReadableSide.read(1).toString(), 'x');
 		});
-		it('addTrailers on server are read by server', function(){
+		it.skip('addTrailers on server are read by server', function(){
 			clientWritableSide.addTrailers({'Foo': 'Bar'});
 			clientWritableSide.end();
 			assert.strictEqual(serverReadableSide.trailers, 'x');
@@ -64,13 +64,46 @@ describe('makeRequestPair', function(){
 		it('pipe()');
 	});
 	describe('serverReadableSide instanceof IncomingMessage', function(){
+		var pair, clientWritableSide, serverReadableSide;
+		beforeEach(function(){
+			pair = lib.makeRequestPair({}, {
+				path: '/foo',
+				method: 'POST',
+				headers: {Accept: 'text/plain, application/json'},
+			});
+			serverReadableSide = pair.serverReadableSide;
+			clientWritableSide = pair.clientWritableSide;
+			// clientWritableSide.writeHead(400, 'Message', {Accept: 'text/plain, application/json'});
+			// clientWritableSide.flushHeaders();
+			clientWritableSide.end('Content\r\n');
+		});
+		// it('serverReadableSide instanceof IncomingMessage', function(){
+		// 	assert(serverReadableSide instanceof http.IncomingMessage);
+		// });
 		it('rawTrailers');
 		it('trailers');
-		it('statusCode');
-		it('statusMessage');
-		it('url');
+		it('statusCode', function(){
+			return serverReadableSide.ready.then(function(){
+				assert.strictEqual(serverReadableSide.statusCode, null);
+			});
+		});
+		it('statusMessage', function(){
+			return serverReadableSide.ready.then(function(){
+				assert.strictEqual(serverReadableSide.statusMessage, null);
+			});
+		});
+		it('url', function(){
+			return serverReadableSide.ready.then(function(){
+				assert.strictEqual(serverReadableSide.url, '/foo');
+			});
+		});
 		it('httpVersion');
-		it('headers');
+		it('headers', function(){
+			return serverReadableSide.ready.then(function(){
+				// FIXME maybe test it is [Object: null prototype]
+				assert.strictEqual(serverReadableSide.headers['accept'], 'text/plain, application/json');
+			});
+		});
 		it('complete');
 		it('aborted');
 		it('setTimeout(msecs, callback)');

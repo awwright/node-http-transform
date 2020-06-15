@@ -27,7 +27,7 @@ describe('makeResponsePair', function(){
 			assert.strictEqual(clientReadableSide.hasHeader('Content-Type'), true);
 			assert.strictEqual(clientReadableSide.getHeader('Content-Type'), 'text/plain; charset=UTF-8');
 		});
-		it('removeHeader is read by client', function(){
+		it.skip('removeHeader is read by client', function(){
 			assert.strictEqual(serverWritableSide.hasHeader('Date'), true);
 			serverWritableSide.removeHeader('Date');
 			assert.strictEqual(clientReadableSide.hasHeader('Date'));
@@ -36,7 +36,7 @@ describe('makeResponsePair', function(){
 			serverWritableSide.end('x');
 			assert.strictEqual(clientReadableSide.read(1).toString(), 'x');
 		});
-		it('addTrailers on server are read by client', function(){
+		it.skip('addTrailers on server are read by client', function(){
 			serverWritableSide.addTrailers({'Foo': 'Bar'});
 			serverWritableSide.end();
 			assert.strictEqual(clientReadableSide.trailers, 'x');
@@ -192,17 +192,35 @@ describe('makeResponsePair', function(){
 			pair = lib.makeResponsePair();
 			serverWritableSide = pair.serverWritableSide;
 			clientReadableSide = pair.clientReadableSide;
+			serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
+			serverWritableSide.end('Content\r\n');
 		});
 		// it('clientReadableSide instanceof IncomingMessage', function(){
 		// 	assert(clientReadableSide instanceof http.IncomingMessage);
 		// });
 		it('rawTrailers');
 		it('trailers');
-		it('statusCode');
-		it('statusMessage');
-		it('url');
+		it('statusCode', function(){
+			return clientReadableSide.ready.then(function(){
+				assert.strictEqual(clientReadableSide.statusCode, 400);
+			});
+		});
+		it('statusMessage', function(){
+			return clientReadableSide.ready.then(function(){
+				assert.strictEqual(clientReadableSide.statusMessage, 'Message');
+			});
+		});
+		it('url', function(){
+			return clientReadableSide.ready.then(function(){
+				assert.strictEqual(clientReadableSide.url, '');
+			});
+		});
 		it('httpVersion');
-		it('headers');
+		it('headers', function(){
+			return clientReadableSide.ready.then(function(){
+				assert.deepStrictEqual(clientReadableSide.headers, {allow: 'GET, HEAD, POST'});
+			});
+		});
 		it('complete');
 		it('aborted');
 		it('setTimeout(msecs, callback)');
