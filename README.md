@@ -73,7 +73,7 @@ server.listen(8080);
 
 ## API
 
-### ServerResponseTransform
+### ResponseTransform
 
 A subclass of the Node.js Transform that also transforms HTTP headers and status code.
 

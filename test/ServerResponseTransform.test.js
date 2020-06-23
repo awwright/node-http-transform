@@ -1,13 +1,14 @@
+"use strict";
 
 const assert = require('assert');
-const ServerResponseTransform = require('..').ServerResponseTransform;
+const ResponseTransform = require('..').ResponseTransform;
 const ServerResponseBuffer = require('./Buffer.js').ServerResponseBuffer;
-const ServerResponsePassThrough = require('..').ServerResponsePassThrough;
+const ResponsePassThrough = require('..').ResponsePassThrough;
 const { PassThrough } = require('stream');
 
 describe('Transform', function() {
 	it('methods', function(done) {
-		var t = new ServerResponseTransform({
+		var t = new ResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){
 				// console.log('transform');
@@ -27,7 +28,7 @@ describe('Transform', function() {
 		src.pipe(t).on('finish', done);
 	});
 	it('modify content', function(done) {
-		var t = new ServerResponseTransform({
+		var t = new ResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){ cb(null, data+'!'); },
 			flush: function(cb){ cb(); },
@@ -47,7 +48,7 @@ describe('Transform', function() {
 		src.pipe(t).pipe(end);
 	});
 	it('headers injection', function(done) {
-		var t = new ServerResponseTransform({
+		var t = new ResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){ cb(null, data); },
 			flush: function(cb){ cb(); },
@@ -67,7 +68,7 @@ describe('Transform', function() {
 		src.pipe(t).pipe(end);
 	});
 	it('headers injection (array)', function(done) {
-		var t = new ServerResponseTransform({
+		var t = new ResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){ cb(null, data); },
 			flush: function(cb){ cb(); },
@@ -87,7 +88,7 @@ describe('Transform', function() {
 		src.pipe(t).pipe(end);
 	});
 	it('headers transform immediate', function(done) {
-		var t = new ServerResponseTransform({
+		var t = new ResponseTransform({
 			transformHead: function(res){
 				res.setHeader('Content-Type', 'application/xml');
 				return res;
@@ -111,7 +112,7 @@ describe('Transform', function() {
 	});
 	it('headers transform asynchronous', function() {
 		return void this.skip();
-		var t = new ServerResponseTransform({
+		var t = new ResponseTransform({
 			transformHead: function(res, cb){
 				setTimeout(function(){
 					res.setHeader('Content-Type', 'application/xml');
@@ -135,7 +136,7 @@ describe('Transform', function() {
 		src.pipe(t).pipe(end);
 	});
 	it('read contents then set headers', function(done) {
-		var t = new ServerResponseTransform({
+		var t = new ResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){ cb(null); },
 			flush: function(cb){ this.setHeader('Content-Type', 'text/plain'); cb(null, 'Content'); },
@@ -158,14 +159,14 @@ describe('Transform', function() {
 		src.end('test');
 		src.pipe(t).pipe(end);
 	});
-	it('read contents then set headers (ServerResponsePassThrough)', function(done) {
-		var t = new ServerResponseTransform({
+	it('read contents then set headers (ResponsePassThrough)', function(done) {
+		var t = new ResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){ cb(null); },
 			flush: function(cb){ this.setHeader('Content-Type', 'text/plain'); cb(null, 'Content'); },
 			final: function(cb){ cb(); },
 		});
-		var src = new ServerResponsePassThrough;
+		var src = new ResponsePassThrough;
 		var end = new ServerResponseBuffer;
 		end.on('finish', function(){
 			assert.deepEqual(end.headers, {
@@ -180,11 +181,11 @@ describe('Transform', function() {
 		});
 		t.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(t).pipe(ServerResponsePassThrough()).pipe(end);
+		src.pipe(t).pipe(ResponsePassThrough()).pipe(end);
 	});
-	it('setStatusCode (ServerResponsePassThrough)', function(done) {
-		var src = new ServerResponsePassThrough;
-		var ttt = new ServerResponseTransform({
+	it('setStatusCode (ResponsePassThrough)', function(done) {
+		var src = new ResponsePassThrough;
+		var ttt = new ResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){ cb(null); },
 			flush: function(cb){ this.statusCode = 204; this.setHeader('Content-Type', 'text/plain'); cb(null); },
@@ -198,12 +199,12 @@ describe('Transform', function() {
 		});
 		ttt.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(ttt).pipe(ServerResponsePassThrough()).pipe(end);
+		src.pipe(ttt).pipe(ResponsePassThrough()).pipe(end);
 	});
 	it('on headersReady', function(done) {
 		var data = 0;
-		var src = new ServerResponsePassThrough;
-		var ttt = new ServerResponseTransform({
+		var src = new ResponsePassThrough;
+		var ttt = new ResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){ cb(null); },
 			flush: function(cb){ this.statusCode = 204; this.setHeader('Content-Type', 'text/plain'); cb(null); },
@@ -221,12 +222,12 @@ describe('Transform', function() {
 		});
 		ttt.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(ttt).pipe(ServerResponsePassThrough()).pipe(end);
+		src.pipe(ttt).pipe(ResponsePassThrough()).pipe(end);
 	});
 	it('headersReady', function() {
 		var data = 0;
-		var src = new ServerResponsePassThrough;
-		var ttt = new ServerResponseTransform({
+		var src = new ResponsePassThrough;
+		var ttt = new ResponseTransform({
 			transformHead: function(res){ return res; },
 			transform: function(data, enc, cb){ cb(null); },
 			flush: function(cb){ this.statusCode = 204; this.setHeader('Content-Type', 'text/plain'); cb(null); },
@@ -238,7 +239,7 @@ describe('Transform', function() {
 		});
 		ttt.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(ttt).pipe(ServerResponsePassThrough()).pipe(end);
+		src.pipe(ttt).pipe(ResponsePassThrough()).pipe(end);
 		return end.headersReady.then(function(){
 			assert(!data);
 		});

@@ -1,6 +1,7 @@
+"use strict";
 
 const inherits = require('util').inherits;
-const ServerResponseTransform = require('../lib/ServerResponseTransform.js').ServerResponseTransform;
+const ServerResponseTransform = require('../lib/ResponseTransform.js').ResponseTransform;
 
 // Pipe through an HTTP request - can serve to merge two streams together, e.g. to set Content-Type
 module.exports.ServerResponseBuffer = ServerResponseBuffer;
