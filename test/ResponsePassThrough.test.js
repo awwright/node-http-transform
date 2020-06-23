@@ -1,21 +1,23 @@
 
 const assert = require('assert');
-const ServerResponsePassThrough = require('..').ServerResponsePassThrough;
+const ResponsePassThrough = require('..').ResponsePassThrough;
 const PassThrough = require('stream').PassThrough;
 
-describe('ServerResponsePassThrough', function(){
+describe('ResponsePassThrough', function(){
 	describe('pipeMessage', function(){
 		var iin, iout;
 		beforeEach(function(){
-			iin = new ServerResponsePassThrough;
-			iout = new ServerResponsePassThrough;
-			iin.pipeMessage(iout);
+			iin = new ResponsePassThrough;
+			iout = new ResponsePassThrough;
+			iin.pipe(iout);
 		});
 		it('statusCode', function(){
 			iin.statusCode = 500;
 			assert.equal(iin.statusCode, 500);
 			iin.end();
-			assert.equal(iout.statusCode, 500);
+			return iout.ready.then(function(){
+				assert.equal(iout.statusCode, 500);
+			});
 		});
 		it('addHeader', function(){
 			iin.addHeader('Link', '<http://example.com/a>');
@@ -80,8 +82,8 @@ describe('ServerResponsePassThrough', function(){
 	describe('pipeBody', function(){
 		var iin, iout;
 		beforeEach(function(){
-			iin = new ServerResponsePassThrough;
-			iout = new ServerResponsePassThrough;
+			iin = new ResponsePassThrough;
+			iout = new ResponsePassThrough;
 			iin.pipeBody(iout);
 		});
 		it('statusCode', function(){
@@ -119,9 +121,9 @@ describe('ServerResponsePassThrough', function(){
 	});
 	describe('pipe (merging streams)', function(){
 		it('statusCode', function(){
-			var iin = new ServerResponsePassThrough;
+			var iin = new ResponsePassThrough;
 			var stream = new PassThrough;
-			var iout = new ServerResponsePassThrough;
+			var iout = new ResponsePassThrough;
 			iin.statusCode = 404;
 			iin.setHeader('Content-Type', 'text/plain');
 			stream.pipe(iin);
