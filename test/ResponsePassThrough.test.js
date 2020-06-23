@@ -25,53 +25,69 @@ describe('ResponsePassThrough', function(){
 			iin.addHeader('link', '<http://example.com/c>');
 			assert.equal(iin.getHeader('Link').length, 3);
 			iin.end();
-			assert.equal(iout.getHeader('Link').length, 3);
+			return iout.ready.then(function(){
+				assert.equal(iout.getHeader('Link').length, 3);
+			});
 		});
 		it('statusMessage', function(){
 			iin.statusMessage = 'Server Error';
 			assert.equal(iin.statusMessage, 'Server Error');
 			iin.end();
-			assert.equal(iout.statusMessage, 'Server Error');
+			return iout.ready.then(function(){
+				assert.equal(iout.statusMessage, 'Server Error');
+			});
 		});
 		it('hasHeader', function(){
 			iin.setHeader('Content-Type', 'text/plain');
 			assert(iin.hasHeader('Content-Type'));
 			iin.end();
-			assert(iout.hasHeader('Content-Type'));
+			return iout.ready.then(function(){
+				assert(iout.hasHeader('Content-Type'));
+			});
 		});
 		it('getHeader', function(){
 			iin.setHeader('Content-Type', 'text/plain');
 			assert.equal(iin.getHeader('Content-Type'), 'text/plain');
 			iin.end();
-			assert.equal(iout.getHeader('Content-Type'), 'text/plain');
+			return iout.ready.then(function(){
+				assert.equal(iout.getHeader('Content-Type'), 'text/plain');
+			});
 		});
 		it('removeHeader', function(){
 			iin.setHeader('Content-Type', 'text/plain');
 			assert(iin.hasHeader('Content-Type'));
+			iin.removeHeader('Content-Type');
+			assert(!iin.hasHeader('Content-Type'));
 			iin.end();
-			assert(iout.hasHeader('Content-Type'));
-			iout.removeHeader('Content-Type');
-			assert(!iout.hasHeader('Content-Type'));
+			return iout.ready.then(function(){
+				assert(!iout.hasHeader('Content-Type'));
+			});
 		});
 		it('getHeaders', function(){
 			iin.setHeader('Content-Type', 'text/plain');
 			iin.end();
-			assert.equal(Object.keys(iin.getHeaders()).length, 1);
-			assert.equal(Object.keys(iout.getHeaders()).length, 1);
+			return iout.ready.then(function(){
+				assert.equal(Object.keys(iin.getHeaders()).length, 1);
+				assert.equal(Object.keys(iout.getHeaders()).length, 1);
+			});
 		});
 		it('getHeaderNames (empty)', function(){
 			iin.end();
-			assert.equal(iin.getHeaderNames().length, 0);
-			assert.equal(iout.getHeaderNames().length, 0);
+			return iout.ready.then(function(){
+				assert.equal(iin.getHeaderNames().length, 0);
+				assert.equal(iout.getHeaderNames().length, 0);
+			});
 		});
 		it('getHeaderNames', function(){
 			iin.setHeader('Content-Type', 'text/plain');
 			iin.end();
-			assert.equal(iin.getHeaderNames().length, 1);
-			assert.equal(iout.getHeaderNames().length, 1);
-			// Node.js seems to normalize the names of the headers to lowercase for this function
-			assert.equal(iin.getHeaderNames()[0], 'content-type');
-			assert.equal(iout.getHeaderNames()[0], 'content-type');
+			return iout.ready.then(function(){
+				assert.equal(iin.getHeaderNames().length, 1);
+				assert.equal(iout.getHeaderNames().length, 1);
+				// Node.js seems to normalize the names of the headers to lowercase for this function
+				assert.equal(iin.getHeaderNames()[0], 'content-type');
+				assert.equal(iout.getHeaderNames()[0], 'content-type');
+			});
 		});
 		it('headersReady', function(){
 			iin.setHeader('Content-Type', 'text/plain');
@@ -133,7 +149,7 @@ describe('ResponsePassThrough', function(){
 
 			iin.pipe(iout);
 
-			return iout.headersReady.then(function(){
+			return iout.ready.then(function(){
 				assert.equal(iout.statusCode, 404);
 			});
 		});

@@ -11,5 +11,5 @@ module.exports.RequestPair = require('./lib/Pair.js').RequestPair;
 
 // depreciated aliases
 module.exports.ServerResponseTransform = require('./lib/ResponseTransform.js').ResponseTransform;
-module.exports.ServerResponsePassThrough = require('./lib/PassThrough.js').PassThrough;
+module.exports.ServerResponsePassThrough = require('./lib/PassThrough.js').ResponsePassThrough;
 module.exports.PassThrough = require('./lib/PassThrough.js').ResponsePassThrough;
