@@ -2,6 +2,13 @@
 
 An extension of the Node.js Transform stream that additionally supports the HTTP header interface.
 
+* `RequestPair`: creates a pair of related streams, one writable, one readable; anything written to the `clientWritableSide` is readable on the `serverReadableSide`; intended for simulating a client side and a server side of a request. Headers are normalized, the way Node.js does, by default.
+* `ResponsePair`:  creates a pair of related streams, one writable, one readable; anything written to the `serverWritableSide` is readable on the `clientReadableSide`; intended for simulating a client side and a server side of a response. Headers are normalized, the way Node.js does, by default.
+* `RequestTransform`: creates a Duplex stream that also stores HTTP headers; the implementation of `_transform` and `_transformHead` methods allow the message to be transformed before it becomes readable.
+* `ResponseTransform`: creates a Duplex stream that also stores HTTP headers; the implementation of `_transform` and `_transformHead` methods allow the message to be transformed before it becomes readable.
+* `RequestPassThrough`: creates a Duplex stream that also stores HTTP headers; anything written to it becomes readable. Headers are not normalized; data is passed through as exactly as possible.
+* `ResponsePassThrough`: creates a Duplex stream that also stores HTTP headers; anything written to it becomes readable. Headers are not normalized; data is passed through as exactly as possible.
+
 
 ## Features
 
