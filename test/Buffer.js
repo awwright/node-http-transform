@@ -8,7 +8,7 @@ module.exports.ServerResponseBuffer = ServerResponseBuffer;
 inherits(ServerResponseBuffer, ServerResponseTransform);
 function ServerResponseBuffer(){
 	if (!(this instanceof ServerResponseBuffer)){
-		return new ServerResponseBuffer(options);
+		return new ServerResponseBuffer();
 	}
 	ServerResponseTransform.apply(this, arguments);
 	this.headers = {};

@@ -119,7 +119,7 @@ describe('Transform', function() {
 					cb(null, res);
 				}, 100);
 			},
-			transform: function(data, enc, cb){ debugger; cb(null, data+' x'); },
+			transform: function(data, enc, cb){ cb(null, data+' x'); },
 			flush: function(cb){ cb(); },
 			final: function(cb){ cb(); },
 		});
