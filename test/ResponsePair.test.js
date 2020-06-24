@@ -38,14 +38,14 @@ describe('makeResponsePair', function(){
 		it('statusCode', function(){
 			serverWritableSide.statusCode = 400;
 			serverWritableSide.end();
-			return clientReadableSide.ready.then(function(){
+			return clientReadableSide.headersReady.then(function(){
 				assert.strictEqual(clientReadableSide.statusCode, 400);
 			});
 		});
 		it('statusMessage', function(){
 			serverWritableSide.statusMessage = 'Custom Message';
 			serverWritableSide.end();
-			return clientReadableSide.ready.then(function(){
+			return clientReadableSide.headersReady.then(function(){
 				assert.strictEqual(clientReadableSide.statusMessage, 'Custom Message');
 			});
 		});
@@ -53,7 +53,7 @@ describe('makeResponsePair', function(){
 		it('writeProcessing()');
 		it('writeHead(statusCode, statusMessage, headers)', function(){
 			serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
-			return clientReadableSide.ready.then(function(){
+			return clientReadableSide.headersReady.then(function(){
 				assert.strictEqual(clientReadableSide.statusCode, 400);
 				assert.strictEqual(clientReadableSide.statusMessage, 'Message');
 				assert.strictEqual(clientReadableSide.headers['allow'], 'GET, HEAD, POST');
@@ -73,7 +73,7 @@ describe('makeResponsePair', function(){
 		it('setHeader(name, value)', function(){
 			serverWritableSide.setHeader('Allow', 'GET, HEAD, POST');
 			serverWritableSide.end();
-			return clientReadableSide.ready.then(function(){
+			return clientReadableSide.headersReady.then(function(){
 				assert.strictEqual(clientReadableSide.headers['allow'], 'GET, HEAD, POST');
 			});
 		});
@@ -109,7 +109,7 @@ describe('makeResponsePair', function(){
 		it('flushHeaders()', function(){
 			serverWritableSide.setHeader('Allow', 'GET, HEAD, POST');
 			serverWritableSide.flushHeaders();
-			return clientReadableSide.ready.then(function(){
+			return clientReadableSide.headersReady.then(function(){
 				assert.strictEqual(clientReadableSide.headers['allow'], 'GET, HEAD, POST');
 			});
 		});
@@ -178,23 +178,23 @@ describe('makeResponsePair', function(){
 		it('rawTrailers');
 		it('trailers');
 		it('statusCode', function(){
-			return clientReadableSide.ready.then(function(){
+			return clientReadableSide.headersReady.then(function(){
 				assert.strictEqual(clientReadableSide.statusCode, 400);
 			});
 		});
 		it('statusMessage', function(){
-			return clientReadableSide.ready.then(function(){
+			return clientReadableSide.headersReady.then(function(){
 				assert.strictEqual(clientReadableSide.statusMessage, 'Message');
 			});
 		});
 		it('url', function(){
-			return clientReadableSide.ready.then(function(){
+			return clientReadableSide.headersReady.then(function(){
 				assert.strictEqual(clientReadableSide.url, '');
 			});
 		});
 		it('httpVersion');
 		it('headers', function(){
-			return clientReadableSide.ready.then(function(){
+			return clientReadableSide.headersReady.then(function(){
 				assert.deepStrictEqual(clientReadableSide.headers, {allow: 'GET, HEAD, POST'});
 			});
 		});

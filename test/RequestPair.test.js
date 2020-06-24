@@ -25,7 +25,7 @@ describe('makeRequestPair', function(){
 			it('setHeader(name, value)', function(){
 				clientWritableSide.setHeader('Accept', 'GET, HEAD, POST');
 				clientWritableSide.end();
-				return serverReadableSide.ready.then(function(){
+				return serverReadableSide.headersReady.then(function(){
 					assert.strictEqual(serverReadableSide.headers['accept'], 'GET, HEAD, POST');
 				});
 			});
@@ -61,7 +61,7 @@ describe('makeRequestPair', function(){
 			it('flushHeaders()', function(){
 				clientWritableSide.setHeader('Accept', 'GET, HEAD, POST');
 				clientWritableSide.flushHeaders();
-				return serverReadableSide.ready.then(function(){
+				return serverReadableSide.headersReady.then(function(){
 					assert.strictEqual(serverReadableSide.headers['accept'], 'GET, HEAD, POST');
 				});
 			});
@@ -136,23 +136,23 @@ describe('makeRequestPair', function(){
 			it('rawTrailers');
 			it('trailers');
 			it('statusCode', function(){
-				return serverReadableSide.ready.then(function(){
+				return serverReadableSide.headersReady.then(function(){
 					assert.strictEqual(serverReadableSide.statusCode, null);
 				});
 			});
 			it('statusMessage', function(){
-				return serverReadableSide.ready.then(function(){
+				return serverReadableSide.headersReady.then(function(){
 					assert.strictEqual(serverReadableSide.statusMessage, null);
 				});
 			});
 			it('url', function(){
-				return serverReadableSide.ready.then(function(){
+				return serverReadableSide.headersReady.then(function(){
 					assert.strictEqual(serverReadableSide.url, '/foo');
 				});
 			});
 			it('httpVersion');
 			it('headers', function(){
-				return serverReadableSide.ready.then(function(){
+				return serverReadableSide.headersReady.then(function(){
 					// FIXME maybe test it is [Object: null prototype]
 					assert.strictEqual(serverReadableSide.headers['accept'], 'text/plain, application/json');
 				});
