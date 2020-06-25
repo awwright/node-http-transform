@@ -6,7 +6,7 @@ const ServerResponseBuffer = require('./Buffer.js').ServerResponseBuffer;
 const ResponsePassThrough = require('..').ResponsePassThrough;
 const { PassThrough } = require('stream');
 
-describe('Transform', function() {
+describe('ResponseTransform', function() {
 	it('methods', function(done) {
 		var t = new ResponseTransform({
 			transformHead: function(res){ return res; },
