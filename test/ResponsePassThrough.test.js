@@ -1,6 +1,8 @@
 "use strict";
 
 const assert = require('assert');
+const stream = require('stream');
+const http = require('http');
 
 const lib = require('..');
 
@@ -32,9 +34,19 @@ describe('ResponsePassThrough', function(){
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
-			// it('serverWritableSide instanceof ServerResponse', function(){
-			// 	assert(serverWritableSide instanceof http.ServerResponse);
+			it('serverWritableSide instanceof ServerResponse', function(){
+				assert(serverWritableSide instanceof http.ServerResponse);
+			});
+			it('serverWritableSide instanceof OutgoingMessage', function(){
+				assert(serverWritableSide instanceof http.OutgoingMessage);
+			});
+			// For some reason an OutgoingMessage isn't a Writable in Node.js ?!?
+			// it('serverWritableSide instanceof Writable', function(){
+			// 	assert(serverWritableSide instanceof stream.Writable);
 			// });
+			it('serverWritableSide instanceof Stream', function(){
+				assert(serverWritableSide instanceof stream.Stream);
+			});
 			it('statusCode', function(){
 				serverWritableSide.statusCode = 400;
 				serverWritableSide.end();
@@ -174,9 +186,15 @@ describe('ResponsePassThrough', function(){
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
 				serverWritableSide.end('Content\r\n');
 			});
-			// it('clientReadableSide instanceof IncomingMessage', function(){
-			// 	assert(clientReadableSide instanceof http.IncomingMessage);
-			// });
+			it('clientReadableSide instanceof IncomingMessage', function(){
+				assert(clientReadableSide instanceof http.IncomingMessage);
+			});
+			it('clientReadableSide instanceof Readable', function(){
+				assert(clientReadableSide instanceof stream.Readable);
+			});
+			it('clientReadableSide instanceof Stream', function(){
+				assert(clientReadableSide instanceof stream.Stream);
+			});
 			it('rawTrailers');
 			it('trailers');
 			it('statusCode', function(){

@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/awwright/node-http-transform#readme",
   "devDependencies": {
-    "mocha": "^6.1.4",
-    "nyc": "^14.0.0"
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0"
   }
 }
