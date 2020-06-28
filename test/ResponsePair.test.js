@@ -1,40 +1,23 @@
 "use strict";
 
 const assert = require('assert');
+const stream = require('stream');
+const http = require('http');
 
 const lib = require('..');
 
 describe('makeResponsePair', function(){
-	describe('streams', function(){
-		var pair, serverWritableSide, clientReadableSide;
-		beforeEach(function(){
-			pair = lib.makeResponsePair();
-			serverWritableSide = pair.serverWritableSide;
-			clientReadableSide = pair.clientReadableSide;
-		});
-		it.skip('addTrailers on server are read by client', function(){
-			serverWritableSide.addTrailers({'Foo': 'Bar'});
-			serverWritableSide.end();
-			assert.strictEqual(clientReadableSide.trailers, 'x');
-		});
-		it('close on server is read by client', function(done){
-			serverWritableSide.write('x');
-			serverWritableSide.end();
-			clientReadableSide.resume();
-			clientReadableSide.on('end', done);
-		});
-	});
 	describe('serverWritableSide', function(){
-		describe('implements ServerResponse API', function(){
+		describe('implements ServerResponse', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
 				pair = lib.makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
-			// it('serverWritableSide instanceof ServerResponse', function(){
-			// 	assert(serverWritableSide instanceof http.ServerResponse);
-			// });
+			it.skip('serverWritableSide instanceof ServerResponse', function(){
+				assert(serverWritableSide instanceof http.ServerResponse);
+			});
 			it('statusCode', function(){
 				serverWritableSide.statusCode = 400;
 				serverWritableSide.end();
@@ -60,16 +43,16 @@ describe('makeResponsePair', function(){
 				});
 			});
 		});
-		describe('serverWritableSide implements OutgoingMessage API', function(){
+		describe('implements OutgoingMessage', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
 				pair = lib.makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
-			// it('serverWritableSide instanceof OutgoingMessage', function(){
-			// 	assert(serverWritableSide instanceof http.OutgoingMessage);
-			// });
+			it.skip('serverWritableSide instanceof OutgoingMessage', function(){
+				assert(serverWritableSide instanceof http.OutgoingMessage);
+			});
 			it('setHeader(name, value)', function(){
 				serverWritableSide.setHeader('Allow', 'GET, HEAD, POST');
 				serverWritableSide.end();
@@ -204,6 +187,12 @@ describe('makeResponsePair', function(){
 			it('aborted');
 			it('setTimeout(msecs, callback)');
 			it('destroy(error)');
+		});
+		describe('implements Readable', function(){
+			it('destroy()');
+			it('pipe()');
+			it('pause()');
+			it('resume()');
 		});
 	});
 });

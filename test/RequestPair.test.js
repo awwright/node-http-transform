@@ -6,22 +6,22 @@ var lib = require('..');
 
 describe('makeRequestPair', function(){
 	describe('clientWritableSide', function(){
-		describe('instanceof ClientRequest', function(){
+		describe('implements ClientRequest', function(){
 			it('abort()');
 			it('setTimeout()');
 			it('clearTimeout()');
 			it('setNoDelay()');
 		});
-		describe('instanceof OutgoingMessage', function(){
+		describe('implements OutgoingMessage', function(){
 			var pair, clientWritableSide, serverReadableSide;
 			beforeEach(function(){
 				pair = lib.makeRequestPair();
 				clientWritableSide = pair.clientWritableSide;
 				serverReadableSide = pair.serverReadableSide;
 			});
-			// it('clientWritableSide instanceof OutgoingMessage', function(){
-			// 	assert(clientWritableSide instanceof http.OutgoingMessage);
-			// });
+			it.skip('clientWritableSide instanceof OutgoingMessage', function(){
+				assert(clientWritableSide instanceof http.OutgoingMessage);
+			});
 			it('setHeader(name, value)', function(){
 				clientWritableSide.setHeader('Accept', 'GET, HEAD, POST');
 				clientWritableSide.end();
@@ -161,6 +161,12 @@ describe('makeRequestPair', function(){
 			it('aborted');
 			it('setTimeout(msecs, callback)');
 			it('destroy(error)');
+		});
+		describe('implements Readable', function(){
+			it('destroy()');
+			it('pipe()');
+			it('pause()');
+			it('resume()');
 		});
 	});
 });
