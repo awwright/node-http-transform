@@ -4,14 +4,14 @@ const assert = require('assert');
 const stream = require('stream');
 const http = require('http');
 
-const lib = require('..');
+const { makeResponsePair } = require('..');
 
 describe('makeResponsePair', function(){
 	describe('serverWritableSide', function(){
 		describe('WritableSide', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = lib.makeResponsePair();
+				pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -20,7 +20,7 @@ describe('makeResponsePair', function(){
 		describe('implements ServerResponse', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = lib.makeResponsePair();
+				pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -55,7 +55,7 @@ describe('makeResponsePair', function(){
 		describe('implements OutgoingMessage', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = lib.makeResponsePair();
+				pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -130,7 +130,7 @@ describe('makeResponsePair', function(){
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
 				serverWritableSide.end('Content\r\n');
 
-				const pipe = lib.makeResponsePair();
+				const pipe = makeResponsePair();
 				clientReadableSide.pipe(pipe.serverWritableSide);
 
 				var data = '';
@@ -160,7 +160,7 @@ describe('makeResponsePair', function(){
 		describe('ReadableSide', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = lib.makeResponsePair();
+				pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
@@ -172,7 +172,7 @@ describe('makeResponsePair', function(){
 		describe('implements IncomingMessage', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = lib.makeResponsePair();
+				pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});

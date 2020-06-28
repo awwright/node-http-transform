@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 
-var lib = require('..');
+var { makeRequestPair } = require('..');
 
 describe('makeRequestPair', function(){
 	describe('clientWritableSide', function(){
@@ -18,7 +18,7 @@ describe('makeRequestPair', function(){
 		describe('implements OutgoingMessage', function(){
 			var pair, clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				pair = lib.makeRequestPair();
+				pair = makeRequestPair();
 				clientWritableSide = pair.clientWritableSide;
 				serverReadableSide = pair.serverReadableSide;
 			});
@@ -94,7 +94,7 @@ describe('makeRequestPair', function(){
 				clientWritableSide.setHeader('Accept', 'GET, HEAD, POST');
 				clientWritableSide.end('Content\r\n');
 
-				const pipe = lib.makeRequestPair();
+				const pipe = makeRequestPair();
 				serverReadableSide.pipe(pipe.clientWritableSide);
 
 				var data = '';
@@ -122,7 +122,7 @@ describe('makeRequestPair', function(){
 		describe('ReadableSide', function(){
 			var pair, clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				pair = lib.makeRequestPair({}, {
+				pair = makeRequestPair({}, {
 					path: '/foo',
 					method: 'POST',
 					headers: {Accept: 'text/plain, application/json'},
@@ -139,7 +139,7 @@ describe('makeRequestPair', function(){
 		describe('instanceof IncomingMessage', function(){
 			var pair, clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				pair = lib.makeRequestPair({}, {
+				pair = makeRequestPair({}, {
 					path: '/foo',
 					method: 'POST',
 					headers: {Accept: 'text/plain, application/json'},

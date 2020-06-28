@@ -4,14 +4,14 @@ const assert = require('assert');
 const stream = require('stream');
 const http = require('http');
 
-const lib = require('..');
+const { ResponsePassThrough } = require('..');
 
 describe('ResponsePassThrough', function(){
 	describe('serverWritableSide', function(){
 		describe('WritableSide', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = new lib.ResponsePassThrough();
+				pair = new ResponsePassThrough();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -20,7 +20,7 @@ describe('ResponsePassThrough', function(){
 		describe('implements ServerResponse', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = new lib.ResponsePassThrough();
+				pair = new ResponsePassThrough();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -55,7 +55,7 @@ describe('ResponsePassThrough', function(){
 		describe('implements OutgoingMessage', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = new lib.ResponsePassThrough();
+				pair = new ResponsePassThrough();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -137,23 +137,23 @@ describe('ResponsePassThrough', function(){
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
 				serverWritableSide.end('Content\r\n');
 
-				const pipe = lib.makeResponsePair();
-				clientReadableSide.pipe(pipe.serverWritableSide);
+				const through = new ResponsePassThrough();
+				clientReadableSide.pipe(through.serverWritableSide);
 
 				var data = '';
-				pipe.clientReadableSide.setEncoding('UTF-8');
-				pipe.clientReadableSide.on('headers', function(){
-					assert.strictEqual(pipe.clientReadableSide, this);
+				through.clientReadableSide.setEncoding('UTF-8');
+				through.clientReadableSide.on('headers', function(){
+					assert(through.clientReadableSide === this);
 					assert.strictEqual(this.statusCode, 400);
 					assert.strictEqual(this.statusMessage, 'Message');
 					assert.strictEqual(this.headers['allow'], 'GET, HEAD, POST');
 				});
-				pipe.clientReadableSide.on('readable', function(){
-					assert.strictEqual(pipe.clientReadableSide, this);
+				through.clientReadableSide.on('readable', function(){
+					assert(through.clientReadableSide === this);
 					for(var s; null !== (s=this.read());) data += s;
 				});
-				pipe.clientReadableSide.on('end', function(){
-					assert.strictEqual(pipe.clientReadableSide, this);
+				through.clientReadableSide.on('end', function(){
+					assert(through.clientReadableSide === this);
 					assert.strictEqual(this.statusCode, 400);
 					assert.strictEqual(this.statusMessage, 'Message');
 					assert.strictEqual(this.headers['allow'], 'GET, HEAD, POST');
@@ -167,7 +167,7 @@ describe('ResponsePassThrough', function(){
 		describe('ReadableSide', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = lib.makeResponsePair();
+				pair = new ResponsePassThrough();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
@@ -179,7 +179,7 @@ describe('ResponsePassThrough', function(){
 		describe('implements IncomingMessage', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = lib.makeResponsePair();
+				pair = new ResponsePassThrough();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
