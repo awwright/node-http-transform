@@ -8,6 +8,15 @@ const lib = require('..');
 
 describe('makeResponsePair', function(){
 	describe('serverWritableSide', function(){
+		describe('WritableSide', function(){
+			var pair, serverWritableSide, clientReadableSide;
+			beforeEach(function(){
+				pair = lib.makeResponsePair();
+				serverWritableSide = pair.serverWritableSide;
+				clientReadableSide = pair.clientReadableSide;
+			});
+			it.skip('addHeader()');
+		});
 		describe('implements ServerResponse', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
@@ -148,6 +157,18 @@ describe('makeResponsePair', function(){
 		});
 	});
 	describe('clientReadableSide', function(){
+		describe('ReadableSide', function(){
+			var pair, serverWritableSide, clientReadableSide;
+			beforeEach(function(){
+				pair = lib.makeResponsePair();
+				serverWritableSide = pair.serverWritableSide;
+				clientReadableSide = pair.clientReadableSide;
+				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
+				serverWritableSide.end('Content\r\n');
+			});
+			it('pipeHeaders()');
+			it('pipeMessage()');
+		});
 		describe('implements IncomingMessage', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){

@@ -6,6 +6,9 @@ var lib = require('..');
 
 describe('makeRequestPair', function(){
 	describe('clientWritableSide', function(){
+		describe('WritableSide', function(){
+			it('addHeader()');
+		});
 		describe('implements ClientRequest', function(){
 			it('abort()');
 			it('setTimeout()');
@@ -116,6 +119,23 @@ describe('makeRequestPair', function(){
 		});
 	});
 	describe('serverReadableSide', function(){
+		describe('ReadableSide', function(){
+			var pair, clientWritableSide, serverReadableSide;
+			beforeEach(function(){
+				pair = lib.makeRequestPair({}, {
+					path: '/foo',
+					method: 'POST',
+					headers: {Accept: 'text/plain, application/json'},
+				});
+				serverReadableSide = pair.serverReadableSide;
+				clientWritableSide = pair.clientWritableSide;
+				// clientWritableSide.writeHead(400, 'Message', {Accept: 'text/plain, application/json'});
+				// clientWritableSide.flushHeaders();
+				clientWritableSide.end('Content\r\n');
+			});
+			it('pipeHeaders()');
+			it('pipeMessage()');
+		});
 		describe('instanceof IncomingMessage', function(){
 			var pair, clientWritableSide, serverReadableSide;
 			beforeEach(function(){

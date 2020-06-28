@@ -7,27 +7,17 @@ const http = require('http');
 const lib = require('..');
 
 describe('ResponsePassThrough', function(){
-	describe('streams', function(){
-		var pair, serverWritableSide, clientReadableSide;
-		beforeEach(function(){
-			pair = new lib.ResponsePassThrough();
-			serverWritableSide = pair.serverWritableSide;
-			clientReadableSide = pair.clientReadableSide;
-		});
-		it.skip('addTrailers on server are read by client', function(){
-			serverWritableSide.addTrailers({'Foo': 'Bar'});
-			serverWritableSide.end();
-			assert.strictEqual(clientReadableSide.trailers, 'x');
-		});
-		it('close on server is read by client', function(done){
-			serverWritableSide.write('x');
-			serverWritableSide.end();
-			clientReadableSide.resume();
-			clientReadableSide.on('end', done);
-		});
-	});
 	describe('serverWritableSide', function(){
-		describe('implements ServerResponse API', function(){
+		describe('WritableSide', function(){
+			var pair, serverWritableSide, clientReadableSide;
+			beforeEach(function(){
+				pair = new lib.ResponsePassThrough();
+				serverWritableSide = pair.serverWritableSide;
+				clientReadableSide = pair.clientReadableSide;
+			});
+			it.skip('addHeader()');
+		});
+		describe('implements ServerResponse', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
 				pair = new lib.ResponsePassThrough();
@@ -36,16 +26,6 @@ describe('ResponsePassThrough', function(){
 			});
 			it('serverWritableSide instanceof ServerResponse', function(){
 				assert(serverWritableSide instanceof http.ServerResponse);
-			});
-			it('serverWritableSide instanceof OutgoingMessage', function(){
-				assert(serverWritableSide instanceof http.OutgoingMessage);
-			});
-			// For some reason an OutgoingMessage isn't a Writable in Node.js ?!?
-			// it('serverWritableSide instanceof Writable', function(){
-			// 	assert(serverWritableSide instanceof stream.Writable);
-			// });
-			it('serverWritableSide instanceof Stream', function(){
-				assert(serverWritableSide instanceof stream.Stream);
 			});
 			it('statusCode', function(){
 				serverWritableSide.statusCode = 400;
@@ -72,16 +52,23 @@ describe('ResponsePassThrough', function(){
 				});
 			});
 		});
-		describe('implements OutgoingMessage API', function(){
+		describe('implements OutgoingMessage', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
 				pair = new lib.ResponsePassThrough();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
-			// it('serverWritableSide instanceof OutgoingMessage', function(){
-			// 	assert(serverWritableSide instanceof http.OutgoingMessage);
+			it('serverWritableSide instanceof OutgoingMessage', function(){
+				assert(serverWritableSide instanceof http.OutgoingMessage);
+			});
+			// For some reason an OutgoingMessage isn't a Writable in Node.js ?!?
+			// it('serverWritableSide instanceof Writable', function(){
+			// 	assert(serverWritableSide instanceof stream.Writable);
 			// });
+			it('serverWritableSide instanceof Stream', function(){
+				assert(serverWritableSide instanceof stream.Stream);
+			});
 			it('setHeader(name, value)', function(){
 				serverWritableSide.setHeader('Allow', 'GET, HEAD, POST');
 				serverWritableSide.end();
@@ -177,6 +164,18 @@ describe('ResponsePassThrough', function(){
 		});
 	});
 	describe('clientReadableSide', function(){
+		describe('ReadableSide', function(){
+			var pair, serverWritableSide, clientReadableSide;
+			beforeEach(function(){
+				pair = lib.makeResponsePair();
+				serverWritableSide = pair.serverWritableSide;
+				clientReadableSide = pair.clientReadableSide;
+				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
+				serverWritableSide.end('Content\r\n');
+			});
+			it('pipeHeaders()');
+			it('pipeMessage()');
+		});
 		describe('implements IncomingMessage', function(){
 			var pair, serverWritableSide, clientReadableSide;
 			beforeEach(function(){
@@ -222,6 +221,12 @@ describe('ResponsePassThrough', function(){
 			it('aborted');
 			it('setTimeout(msecs, callback)');
 			it('destroy(error)');
+		});
+		describe('implements Readable', function(){
+			it('destroy()');
+			it('pipe()');
+			it('pause()');
+			it('resume()');
 		});
 	});
 });
