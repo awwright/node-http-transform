@@ -126,12 +126,22 @@ describe('makeResponsePair', function(){
 				});
 			});
 			it('addTrailers()');
-			it('pipe()', function(done){
+		});
+	});
+	describe('clientReadableSide', function(){
+		describe('ReadableSide', function(){
+			var pair, serverWritableSide, clientReadableSide;
+			beforeEach(function(){
+				pair = makeResponsePair();
+				serverWritableSide = pair.serverWritableSide;
+				clientReadableSide = pair.clientReadableSide;
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
 				serverWritableSide.end('Content\r\n');
-
+			});
+			it('pipeHeaders()');
+			it('pipeMessage()', function(done){
 				const pipe = makeResponsePair();
-				clientReadableSide.pipe(pipe.serverWritableSide);
+				clientReadableSide.pipeMessage(pipe.serverWritableSide);
 
 				var data = '';
 				pipe.clientReadableSide.setEncoding('UTF-8');
@@ -154,20 +164,6 @@ describe('makeResponsePair', function(){
 					done();
 				});
 			});
-		});
-	});
-	describe('clientReadableSide', function(){
-		describe('ReadableSide', function(){
-			var pair, serverWritableSide, clientReadableSide;
-			beforeEach(function(){
-				pair = makeResponsePair();
-				serverWritableSide = pair.serverWritableSide;
-				clientReadableSide = pair.clientReadableSide;
-				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
-				serverWritableSide.end('Content\r\n');
-			});
-			it('pipeHeaders()');
-			it('pipeMessage()');
 		});
 		describe('implements IncomingMessage', function(){
 			var pair, serverWritableSide, clientReadableSide;
