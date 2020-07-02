@@ -181,7 +181,7 @@ describe('ResponseTransform', function(){
 		});
 		t.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(t).pipe(ResponsePassThrough()).pipe(end);
+		src.pipe(t).pipe(new ResponsePassThrough()).pipe(end);
 	});
 	it('setStatusCode (ResponsePassThrough)', function(done) {
 		var src = new ResponsePassThrough;
@@ -199,7 +199,7 @@ describe('ResponseTransform', function(){
 		});
 		ttt.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(ttt).pipe(ResponsePassThrough()).pipe(end);
+		src.pipe(ttt).pipe(new ResponsePassThrough()).pipe(end);
 	});
 	it('on headersReady', function(done) {
 		var data = 0;
@@ -222,7 +222,7 @@ describe('ResponseTransform', function(){
 		});
 		ttt.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(ttt).pipe(ResponsePassThrough()).pipe(end);
+		src.pipe(ttt).pipe(new ResponsePassThrough()).pipe(end);
 	});
 	it('headersReady', function() {
 		var data = 0;
@@ -239,7 +239,7 @@ describe('ResponseTransform', function(){
 		});
 		ttt.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(ttt).pipe(ResponsePassThrough()).pipe(end);
+		src.pipe(ttt).pipe(new ResponsePassThrough()).pipe(end);
 		return end.headersReady.then(function(){
 			assert(!data);
 		});
