@@ -94,7 +94,7 @@ describe('ResponsePassThrough', function(){
 			// it('serverWritableSide instanceof Writable', function(){
 			// 	assert(serverWritableSide instanceof stream.Writable);
 			// });
-			it.skip('serverWritableSide instanceof Stream', function(){
+			it('serverWritableSide instanceof Stream', function(){
 				assert(serverWritableSide instanceof stream.Stream);
 			});
 			it('setHeader(name, value)', function(){
