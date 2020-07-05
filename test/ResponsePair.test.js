@@ -9,18 +9,27 @@ const { makeResponsePair } = require('..');
 describe('makeResponsePair', function(){
 	describe('serverWritableSide', function(){
 		describe('WritableSide', function(){
-			var pair, serverWritableSide, clientReadableSide;
+			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = makeResponsePair();
+				const pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
-			it.skip('addHeader()');
+			it('addHeader()', function (){
+				serverWritableSide.addHeader('Link', '<http://example.com/>;rel=up');
+				serverWritableSide.addHeader('Link', '<http://example.com/page/2>;rel=next');
+				serverWritableSide.flushHeaders();
+				return clientReadableSide.headersReady.then(function(){
+					assert.strictEqual(clientReadableSide.headers['link'][0], '<http://example.com/>;rel=up');
+					assert.strictEqual(clientReadableSide.headers['link'][1], '<http://example.com/page/2>;rel=next');
+					assert.strictEqual(clientReadableSide.headers['link'].length, 2);
+				});
+			});
 		});
 		describe('implements ServerResponse', function(){
-			var pair, serverWritableSide, clientReadableSide;
+			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = makeResponsePair();
+				const pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -53,9 +62,9 @@ describe('makeResponsePair', function(){
 			});
 		});
 		describe('implements OutgoingMessage', function(){
-			var pair, serverWritableSide, clientReadableSide;
+			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = makeResponsePair();
+				const pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -130,9 +139,9 @@ describe('makeResponsePair', function(){
 	});
 	describe('clientReadableSide', function(){
 		describe('ReadableSide', function(){
-			var pair, serverWritableSide, clientReadableSide;
+			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = makeResponsePair();
+				const pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
@@ -166,9 +175,9 @@ describe('makeResponsePair', function(){
 			});
 		});
 		describe('implements IncomingMessage', function(){
-			var pair, serverWritableSide, clientReadableSide;
+			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				pair = makeResponsePair();
+				const pair = makeResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});

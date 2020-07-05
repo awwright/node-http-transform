@@ -39,9 +39,10 @@ describe('ResponsePassThrough', function(){
 			beforeEach(function(){
 				[ serverWritableSide, clientReadableSide ] = makePair();
 			});
-			it.skip('addHeader()', function (){
+			it('addHeader()', function (){
 				serverWritableSide.addHeader('Link', '<http://example.com/>;rel=up');
 				serverWritableSide.addHeader('Link', '<http://example.com/page/2>;rel=next');
+				serverWritableSide.flushHeaders();
 				return clientReadableSide.headersReady.then(function(){
 					assert.strictEqual(clientReadableSide.headers['link'][0], '<http://example.com/>;rel=up');
 					assert.strictEqual(clientReadableSide.headers['link'][1], '<http://example.com/page/2>;rel=next');

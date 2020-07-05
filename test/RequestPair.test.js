@@ -7,7 +7,22 @@ var { makeRequestPair } = require('..');
 describe('makeRequestPair', function(){
 	describe('clientWritableSide', function(){
 		describe('WritableSide', function(){
-			it('addHeader()');
+			var clientWritableSide, serverReadableSide;
+			beforeEach(function(){
+				const pair = makeRequestPair();
+				clientWritableSide = pair.clientWritableSide;
+				serverReadableSide = pair.serverReadableSide;
+			});
+			it('addHeader()', function (){
+				clientWritableSide.addHeader('Link', '<http://example.com/>;rel=up');
+				clientWritableSide.addHeader('Link', '<http://example.com/page/2>;rel=next');
+				clientWritableSide.flushHeaders();
+				return serverReadableSide.headersReady.then(function(){
+					assert.strictEqual(serverReadableSide.headers['link'][0], '<http://example.com/>;rel=up');
+					assert.strictEqual(serverReadableSide.headers['link'][1], '<http://example.com/page/2>;rel=next');
+					assert.strictEqual(serverReadableSide.headers['link'].length, 2);
+				});
+			});
 		});
 		describe('implements ClientRequest', function(){
 			it('abort()');
@@ -16,9 +31,9 @@ describe('makeRequestPair', function(){
 			it('setNoDelay()');
 		});
 		describe('implements OutgoingMessage', function(){
-			var pair, clientWritableSide, serverReadableSide;
+			var clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				pair = makeRequestPair();
+				const pair = makeRequestPair();
 				clientWritableSide = pair.clientWritableSide;
 				serverReadableSide = pair.serverReadableSide;
 			});
@@ -122,7 +137,7 @@ describe('makeRequestPair', function(){
 		describe('ReadableSide', function(){
 			var pair, clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				pair = makeRequestPair({}, {
+				const pair = makeRequestPair({}, {
 					path: '/foo',
 					method: 'POST',
 					headers: {Accept: 'text/plain, application/json'},
@@ -139,7 +154,7 @@ describe('makeRequestPair', function(){
 		describe('instanceof IncomingMessage', function(){
 			var pair, clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				pair = makeRequestPair({}, {
+				const pair = makeRequestPair({}, {
 					path: '/foo',
 					method: 'POST',
 					headers: {Accept: 'text/plain, application/json'},
