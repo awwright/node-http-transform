@@ -148,7 +148,18 @@ describe('makeRequestPair', function(){
 				// clientWritableSide.flushHeaders();
 				clientWritableSide.end('Content\r\n');
 			});
-			it('pipeHeaders()');
+			it('pipeHeaders()', function(done){
+				const through = makeRequestPair();
+				serverReadableSide.pipeMessage(through.clientWritableSide);
+				through.serverReadableSide.setEncoding('UTF-8');
+				through.serverReadableSide.on('headers', function(){
+					assert(through.serverReadableSide === this);
+					assert.strictEqual(this.url, '/foo');
+					assert.strictEqual(this.method, 'POST');
+					assert.strictEqual(this.headers['accept'], 'text/plain, application/json');
+					done();
+				});
+			});
 			it('pipeMessage()');
 		});
 		describe('instanceof IncomingMessage', function(){

@@ -174,7 +174,18 @@ describe('ResponsePassThrough', function(){
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
 				serverWritableSide.end('Content\r\n');
 			});
-			it('pipeHeaders()');
+			it('pipeHeaders()', function(done){
+				const through = new ResponsePassThrough();
+				clientReadableSide.pipeMessage(through.serverWritableSide);
+				through.clientReadableSide.setEncoding('UTF-8');
+				through.clientReadableSide.on('headers', function(){
+					assert(through.clientReadableSide === this);
+					assert.strictEqual(this.statusCode, 400);
+					assert.strictEqual(this.statusMessage, 'Message');
+					assert.strictEqual(this.headers['allow'], 'GET, HEAD, POST');
+					done();
+				});
+			});
 			it('pipeMessage()', function(done){
 				const through = new ResponsePassThrough();
 				clientReadableSide.pipeMessage(through.serverWritableSide);
