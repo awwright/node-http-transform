@@ -2,15 +2,30 @@
 
 An extension of the Node.js Transform stream that additionally supports the HTTP header interface.
 
-* `RequestPair`: creates a pair of related streams, one writable, one readable; anything written to the `clientWritableSide` is readable on the `serverReadableSide`; intended for simulating a client side and a server side of a request. Headers are normalized, the way Node.js does, by default.
-* `ResponsePair`:  creates a pair of related streams, one writable, one readable; anything written to the `serverWritableSide` is readable on the `clientReadableSide`; intended for simulating a client side and a server side of a response. Headers are normalized, the way Node.js does, by default.
-* `RequestTransform`: creates a Duplex stream that also stores HTTP headers; the implementation of `_transform` and `_transformHead` methods allow the message to be transformed before it becomes readable.
-* `ResponseTransform`: creates a Duplex stream that also stores HTTP headers; the implementation of `_transform` and `_transformHead` methods allow the message to be transformed before it becomes readable.
-* `RequestPassThrough`: creates a Duplex stream that also stores HTTP headers; anything written to it becomes readable. Headers are not normalized; data is passed through as exactly as possible.
-* `ResponsePassThrough`: creates a Duplex stream that also stores HTTP headers; anything written to it becomes readable. Headers are not normalized; data is passed through as exactly as possible.
+* `RequestPair`: creates a pair of related streams, one writable, one readable; anything written to the `clientWritableSide` is readable on the `serverReadableSide`.
+* `ResponsePair`:  creates a pair of related streams, one writable, one readable; anything written to the `serverWritableSide` is readable on the `clientReadableSide`.
+* `ResponsePassThrough`: creates a Duplex stream that also stores HTTP headers; anything written to it becomes readable. Headers are passed through as exactly as possible. It should typically possible to pipe a response through a ResponsePassThrough instance with no change in behavior. This is typically used to programmatically create a response that's readable the same way a Node.js `req` object is, and can be piped to a `res` server response object.
+
+
+## TODO
+
+* `RequestPassThrough` — Request variation of `ResponsePassThrough`
+* `RequestThroughOrigin` — subclass of RequestPair that applies header normalizations, as if the request is actually going through the network.
+* `ResponseThroughOrigin` — subclass of ResponsePair that applies header normalizations, as if the response is actually going through the network.
 
 
 ## Features
+
+Mock a readable response object:
+
+```javascript
+function makeResponse(){
+	const res = new ResponsePassThrough;
+	res.setHeader('Content-Type', 'text/plain')
+	res.write('Line\r\n');
+	return res.readableClientSide;
+}
+```
 
 Add a Content-Type to a ReadableStream:
 
@@ -101,8 +116,10 @@ Properties/methods, as implemented in Node.js:
 * getHeaderNames()
 * getHeaders()
 * hasHeader(name)
+* pipe(dst)
 
 Additional methods:
 
 * addHeader(name, value)
-* pipeHeaders(dst) - set status code/message, and call setHeader on supplied destination
+* pipeHeaders(dst) - copy status/message fields to `dst`
+* pipeMessage(dst) - copy status, message fields, and pipe the stream to `dst`

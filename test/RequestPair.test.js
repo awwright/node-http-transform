@@ -135,7 +135,7 @@ describe('makeRequestPair', function(){
 	});
 	describe('serverReadableSide', function(){
 		describe('ReadableSide', function(){
-			var pair, clientWritableSide, serverReadableSide;
+			var clientWritableSide, serverReadableSide;
 			beforeEach(function(){
 				const pair = makeRequestPair({}, {
 					path: '/foo',
@@ -152,7 +152,7 @@ describe('makeRequestPair', function(){
 			it('pipeMessage()');
 		});
 		describe('instanceof IncomingMessage', function(){
-			var pair, clientWritableSide, serverReadableSide;
+			var clientWritableSide, serverReadableSide;
 			beforeEach(function(){
 				const pair = makeRequestPair({}, {
 					path: '/foo',
