@@ -144,8 +144,6 @@ describe('makeRequestPair', function(){
 				});
 				serverReadableSide = pair.serverReadableSide;
 				clientWritableSide = pair.clientWritableSide;
-				// clientWritableSide.writeHead(400, 'Message', {Accept: 'text/plain, application/json'});
-				// clientWritableSide.flushHeaders();
 				clientWritableSide.end('Content\r\n');
 			});
 			it('pipeHeaders()', function(done){
@@ -160,7 +158,31 @@ describe('makeRequestPair', function(){
 					done();
 				});
 			});
-			it('pipeMessage()');
+			it('pipeMessage()', function(done){
+				const through = makeRequestPair();
+				serverReadableSide.pipeMessage(through.clientWritableSide);
+
+				var data = '';
+				through.serverReadableSide.setEncoding('UTF-8');
+				through.serverReadableSide.on('headers', function(){
+					assert.strictEqual(through.serverReadableSide, this);
+					assert.strictEqual(this.url, '/foo');
+					assert.strictEqual(this.method, 'POST');
+					assert.strictEqual(this.headers['accept'], 'text/plain, application/json');
+				});
+				through.serverReadableSide.on('readable', function(){
+					assert.strictEqual(through.serverReadableSide, this);
+					for(var s; null !== (s=this.read());) data += s;
+				});
+				through.serverReadableSide.on('end', function(){
+					assert.strictEqual(through.serverReadableSide, this);
+					assert.strictEqual(this.url, '/foo');
+					assert.strictEqual(this.method, 'POST');
+					assert.strictEqual(this.headers['accept'], 'text/plain, application/json');
+					assert.strictEqual(data, 'Content\r\n');
+					done();
+				});
+			});
 		});
 		describe('instanceof IncomingMessage', function(){
 			var clientWritableSide, serverReadableSide;
