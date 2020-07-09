@@ -1,12 +1,25 @@
 "use strict";
 
 const assert = require('assert');
-const ResponseTransform = require('..').ResponseTransform;
-const ServerResponseBuffer = require('./Buffer.js').ServerResponseBuffer;
-const ResponsePassThrough = require('..').ResponsePassThrough;
+const { ResponseBuffer } = require('./Buffer.js');
+const { ResponsePassThrough, ResponseTransform } = require('..');
 const { PassThrough } = require('stream');
 
 describe('ResponseTransform', function(){
+	it('README example', function(done) {
+		var t = new ResponseTransform(function(input, output){
+			output.setHeader('Content-Type', 'text/plain');
+			output.write('Header\r\n');
+			input.once('readable', async function(){
+				for await(var chunk of input) output.write(chunk.toString().toUpperCase());
+				output.write('Footer\r\n');
+				output.end();
+			});
+		});
+		var src = new PassThrough;
+		src.end('test');
+		src.pipe(t).on('finish', done);
+	});
 	it('methods', function(done) {
 		var t = new ResponseTransform({
 			transformHead: function(res){ return res; },
@@ -36,7 +49,7 @@ describe('ResponseTransform', function(){
 		});
 		var src = new PassThrough;
 		t.setHeader('Content-Type', 'text/plain');
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('finish', function(){
 			assert.deepEqual(end.headers, {
 				'content-type': 'text/plain',
@@ -45,7 +58,7 @@ describe('ResponseTransform', function(){
 			done();
 		});
 		src.end('test');
-		src.pipe(t).pipe(end);
+		src.pipe(t).pipeMessage(end);
 	});
 	it('headers injection', function(done) {
 		var t = new ResponseTransform({
@@ -56,7 +69,7 @@ describe('ResponseTransform', function(){
 		});
 		var src = new PassThrough;
 		t.setHeader('Content-Type', 'application/ecmascript');
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('finish', function(){
 			assert.deepEqual(end.headers, {
 				'content-type': 'application/ecmascript',
@@ -65,7 +78,7 @@ describe('ResponseTransform', function(){
 			done();
 		});
 		src.end('test');
-		src.pipe(t).pipe(end);
+		src.pipe(t).pipeMessage(end);
 	});
 	it('headers injection (array)', function(done) {
 		var t = new ResponseTransform({
@@ -76,7 +89,7 @@ describe('ResponseTransform', function(){
 		});
 		var src = new PassThrough;
 		t.setHeader('Link', ['<3>;rel=next', '<1>;rel=prev']);
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('finish', function(){
 			assert.deepEqual(end.headers, {
 				'link': ['<3>;rel=next', '<1>;rel=prev'],
@@ -85,7 +98,7 @@ describe('ResponseTransform', function(){
 			done();
 		});
 		src.end('test');
-		src.pipe(t).pipe(end);
+		src.pipe(t).pipeMessage(end);
 	});
 	it('headers transform immediate', function(done) {
 		var t = new ResponseTransform({
@@ -99,7 +112,7 @@ describe('ResponseTransform', function(){
 		});
 		var src = new PassThrough;
 		t.setHeader('Content-Type', 'application/ecmascript');
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('finish', function(){
 			assert.deepEqual(end.headers, {
 				'content-type': 'application/xml',
@@ -108,7 +121,7 @@ describe('ResponseTransform', function(){
 			done();
 		});
 		src.end('test');
-		src.pipe(t).pipe(end);
+		src.pipe(t).pipeMessage(end);
 	});
 	it('headers transform asynchronous', function() {
 		return void this.skip();
@@ -125,7 +138,7 @@ describe('ResponseTransform', function(){
 		});
 		var src = new PassThrough;
 		t.setHeader('Content-Type', 'application/ecmascript');
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('finish', function(){
 			assert.deepEqual(end.headers, {
 				'content-type': 'application/xml',
@@ -133,7 +146,7 @@ describe('ResponseTransform', function(){
 			done();
 		});
 		src.end('test');
-		src.pipe(t).pipe(end);
+		src.pipe(t).pipeMessage(end);
 	});
 	it('read contents then set headers', function(done) {
 		var t = new ResponseTransform({
@@ -143,7 +156,7 @@ describe('ResponseTransform', function(){
 			final: function(cb){ cb(); },
 		});
 		var src = new PassThrough;
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('finish', function(){
 			assert.deepEqual(end.headers, {
 				'content-type': 'text/plain',
@@ -157,7 +170,7 @@ describe('ResponseTransform', function(){
 		});
 		t.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(t).pipe(end);
+		src.pipe(t).pipeMessage(end);
 	});
 	it('read contents then set headers (ResponsePassThrough)', function(done) {
 		var t = new ResponseTransform({
@@ -167,7 +180,7 @@ describe('ResponseTransform', function(){
 			final: function(cb){ cb(); },
 		});
 		var src = new ResponsePassThrough;
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('finish', function(){
 			assert.deepEqual(end.headers, {
 				'content-type': 'text/plain',
@@ -181,7 +194,7 @@ describe('ResponseTransform', function(){
 		});
 		t.setHeader('Content-Type', 'text/css');
 		src.end('test');
-		src.pipe(t).pipe(new ResponsePassThrough()).pipe(end);
+		src.pipe(t).pipe(new ResponsePassThrough()).pipeMessage(end);
 	});
 	it('setStatusCode (ResponsePassThrough)', function(done) {
 		var src = new ResponsePassThrough;
@@ -191,7 +204,7 @@ describe('ResponseTransform', function(){
 			flush: function(cb){ this.statusCode = 204; this.setHeader('Content-Type', 'text/plain'); cb(null); },
 			final: function(cb){ cb(); },
 		});
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('finish', function(){
 			assert.equal(end.statusCode, 204);
 			assert.equal(end.getHeader('Content-Type'), 'text/plain');
@@ -210,7 +223,7 @@ describe('ResponseTransform', function(){
 			flush: function(cb){ this.statusCode = 204; this.setHeader('Content-Type', 'text/plain'); cb(null); },
 			final: function(cb){ cb(); },
 		});
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('headersReady', function(){
 			assert.equal(end.statusCode, 204);
 			assert.equal(end.getHeader('Content-Type'), 'text/plain');
@@ -233,7 +246,7 @@ describe('ResponseTransform', function(){
 			flush: function(cb){ this.statusCode = 204; this.setHeader('Content-Type', 'text/plain'); cb(null); },
 			final: function(cb){ cb(); },
 		});
-		var end = new ServerResponseBuffer;
+		var end = new ResponseBuffer;
 		end.on('data', function(){
 			data++;
 		});

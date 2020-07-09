@@ -33,40 +33,33 @@ Add a Content-Type to a ReadableStream:
 const http = require('http');
 const { createReadStream } = require('fs');
 const { inherits } = require('util');
-const { ServerResponseTransform } = require('.');
+const { ResponseTransform } = require('.');
 const { markdown } = require( "markdown" );
 
-inherits(MarkdownTransform, ServerResponseTransform);
-function MarkdownTransform(){
-	if(!(this instanceof MarkdownTransform)) return new MarkdownTransform();
-	ServerResponseTransform.call(this);
-	this.sourceContents = '';
-	this.push('<!DOCTYPE html>');
-	this.push('<html xmlns="http://www.w3.org/1999/xhtml" lang="en" dir="ltr">');
-	this.push('	<head>');
-	this.push('		<meta charset="UTF-8" />');
-	this.push('		<title></title>');
-	this.push('		<meta name="description" content="" />');
-	this.push('	</head>');
-	this.push('	<body>');
-	this.push('		<main id="main-content">');
-};
-MarkdownTransform.prototype._transformHead = function _transformHead(headers){
-	headers.setHeader('Content-Type', 'application/xhtml+xml');
-	return headers;
-};
-MarkdownTransform.prototype._transform = function _transform(data, encoding, callback){
-	// Buffer incoming MarkdownTransform data
-	this.sourceContents += data;
-	callback(null);
-};
-MarkdownTransform.prototype._flush = function _flush(callback){
-	// Render the MarkdownTransform to HTML and push out trailers
-	this.push(markdown.toHTML(this.sourceContents));
-	this.push('		</main>');
-	this.push('	</body>');
-	this.push('</html>');
-	callback();
+class MarkdownTransform extends ResponseTransform {
+	constructor() {
+		super();
+		const [ input, output ] = this.makeStreams();
+		output.setHeader('Content-Type', 'application/xhtml+xml');
+		output.write('<!DOCTYPE html>');
+		output.write('<html xmlns="http://www.w3.org/1999/xhtml" lang="en" dir="ltr">');
+		output.write('	<head>');
+		output.write('		<meta charset="UTF-8" />');
+		output.write('		<title></title>');
+		output.write('		<meta name="description" content="" />');
+		output.write('	</head>');
+		output.write('	<body>');
+		output.write('		<main id="main-content">');
+		input.once('readable', async function(){
+			var source = '';
+			for await(var chunk of input) source += chunk.toString();
+			output.write(markdown.toHTML(this.sourceContents));
+			output.write('		</main>');
+			output.write('	</body>');
+			output.write('</html>');
+			output.end();
+		});
+	}
 };
 
 const server = http.createServer(function(req, res) {

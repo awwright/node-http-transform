@@ -1,34 +1,18 @@
 "use strict";
 
-const inherits = require('util').inherits;
-const ResponseTransform = require('../lib/ResponseTransform.js').ResponseTransform;
+const { ResponseWritable } = require('../lib/ResponseTransform.js');
 
-// Pipe through an HTTP request - can serve to merge two streams together, e.g. to set Content-Type
-module.exports.ServerResponseBuffer = ServerResponseBuffer;
-inherits(ServerResponseBuffer, ResponseTransform);
-function ServerResponseBuffer(){
-	if (!(this instanceof ServerResponseBuffer)){
-		return new ServerResponseBuffer();
+class ResponseBuffer extends ResponseWritable {
+	constructor() {
+		super();
+		const self = this;
+		self.body = '';
+		const input = this.makeReadableSide();
+		input.once('readable', async function(){
+			for await(var chunk of input) self.body += chunk.toString();
+			self.emit('end');
+		});
 	}
-	ResponseTransform.apply(this, arguments);
-	this.headers = {};
-	this.body = '';
 }
 
-ServerResponseBuffer.prototype.setHeader = function(name, value) {
-	this.headers[name.toLowerCase()] = value;
-	ResponseTransform.prototype.setHeader.apply(this, arguments);
-};
-
-ServerResponseBuffer.prototype._transformHead = function _transformHead(res, cb) {
-	if(typeof cb=='function') cb(null, res);
-	return res;
-};
-
-ServerResponseBuffer.prototype._transform = function _transform(chunk, encoding, cb) {
-	var str = chunk.toString();
-	this.body += str;
-	cb(null, chunk);
-};
-
-
+module.exports.ResponseBuffer = ResponseBuffer;
