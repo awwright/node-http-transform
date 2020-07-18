@@ -1,6 +1,7 @@
 "use strict";
 
 var assert = require('assert');
+var http = require('http');
 
 var { makeRequestPair } = require('..');
 
