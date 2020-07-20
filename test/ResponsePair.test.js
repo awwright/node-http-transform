@@ -4,9 +4,9 @@ const assert = require('assert');
 const stream = require('stream');
 const http = require('http');
 
-const { makeResponsePair, ResponsePair } = require('..');
+const { ResponsePair } = require('..');
 
-describe('makeResponsePair', function(){
+describe('ResponsePair', function(){
 	describe('reading headers early produces error', function(){
 		var headers;
 		beforeEach(function(){
@@ -67,7 +67,7 @@ describe('makeResponsePair', function(){
 		describe('WritableSide', function(){
 			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				const pair = makeResponsePair();
+				const pair = new ResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -85,7 +85,7 @@ describe('makeResponsePair', function(){
 		describe('implements ServerResponse', function(){
 			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				const pair = makeResponsePair();
+				const pair = new ResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -120,7 +120,7 @@ describe('makeResponsePair', function(){
 		describe('implements OutgoingMessage', function(){
 			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				const pair = makeResponsePair();
+				const pair = new ResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 			});
@@ -197,14 +197,14 @@ describe('makeResponsePair', function(){
 		describe('ReadableSide', function(){
 			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				const pair = makeResponsePair();
+				const pair = new ResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});
 				serverWritableSide.end('Content\r\n');
 			});
 			it('pipeHeaders()', function(done){
-				const through = makeResponsePair();
+				const through = new ResponsePair();
 				clientReadableSide.pipeMessage(through.serverWritableSide);
 				through.clientReadableSide.setEncoding('UTF-8');
 				through.clientReadableSide.on('headers', function(){
@@ -216,7 +216,7 @@ describe('makeResponsePair', function(){
 				});
 			});
 			it('pipeMessage()', function(done){
-				const pipe = makeResponsePair();
+				const pipe = new ResponsePair();
 				clientReadableSide.pipeMessage(pipe.serverWritableSide);
 
 				var data = '';
@@ -244,7 +244,7 @@ describe('makeResponsePair', function(){
 		describe('implements IncomingMessage', function(){
 			var serverWritableSide, clientReadableSide;
 			beforeEach(function(){
-				const pair = makeResponsePair();
+				const pair = new ResponsePair();
 				serverWritableSide = pair.serverWritableSide;
 				clientReadableSide = pair.clientReadableSide;
 				serverWritableSide.writeHead(400, 'Message', {Allow: 'GET, HEAD, POST'});

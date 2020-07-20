@@ -6,9 +6,7 @@ module.exports.ResponseWritable = require('./lib/ResponseTransform.js').Response
 module.exports.ResponseReadable = require('./lib/ResponseTransform.js').ResponseReadable;
 module.exports.ResponseTransform = require('./lib/ResponseTransform.js').ResponseTransform;
 module.exports.ResponsePassThrough = require('./lib/PassThrough.js').ResponsePassThrough;
-module.exports.makeResponsePair = require('./lib/Pair.js').makeResponsePair;
 module.exports.ResponsePair = require('./lib/Pair.js').ResponsePair;
-module.exports.makeRequestPair = require('./lib/Pair.js').makeRequestPair;
 module.exports.RequestPair = require('./lib/Pair.js').RequestPair;
 
 // depreciated aliases

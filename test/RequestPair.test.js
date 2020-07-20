@@ -3,14 +3,14 @@
 var assert = require('assert');
 var http = require('http');
 
-var { makeRequestPair } = require('..');
+var { RequestPair } = require('..');
 
-describe('makeRequestPair', function(){
+describe('RequestPair', function(){
 	describe('clientWritableSide', function(){
 		describe('WritableSide', function(){
 			var clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				const pair = makeRequestPair();
+				const pair = new RequestPair();
 				clientWritableSide = pair.clientWritableSide;
 				serverReadableSide = pair.serverReadableSide;
 			});
@@ -34,7 +34,7 @@ describe('makeRequestPair', function(){
 		describe('implements OutgoingMessage', function(){
 			var clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				const pair = makeRequestPair();
+				const pair = new RequestPair();
 				clientWritableSide = pair.clientWritableSide;
 				serverReadableSide = pair.serverReadableSide;
 			});
@@ -110,7 +110,7 @@ describe('makeRequestPair', function(){
 				clientWritableSide.setHeader('Accept', 'GET, HEAD, POST');
 				clientWritableSide.end('Content\r\n');
 
-				const pipe = makeRequestPair();
+				const pipe = new RequestPair();
 				serverReadableSide.pipe(pipe.clientWritableSide);
 
 				var data = '';
@@ -138,7 +138,7 @@ describe('makeRequestPair', function(){
 		describe('ReadableSide', function(){
 			var clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				const pair = makeRequestPair({}, {
+				const pair = new RequestPair({}, {
 					path: '/foo',
 					method: 'POST',
 					headers: {Accept: 'text/plain, application/json'},
@@ -148,7 +148,7 @@ describe('makeRequestPair', function(){
 				clientWritableSide.end('Content\r\n');
 			});
 			it('pipeHeaders()', function(done){
-				const through = makeRequestPair();
+				const through = new RequestPair();
 				serverReadableSide.pipeMessage(through.clientWritableSide);
 				through.serverReadableSide.setEncoding('UTF-8');
 				through.serverReadableSide.on('headers', function(){
@@ -160,7 +160,7 @@ describe('makeRequestPair', function(){
 				});
 			});
 			it('pipeMessage()', function(done){
-				const through = makeRequestPair();
+				const through = new RequestPair();
 				serverReadableSide.pipeMessage(through.clientWritableSide);
 
 				var data = '';
@@ -188,7 +188,7 @@ describe('makeRequestPair', function(){
 		describe('instanceof IncomingMessage', function(){
 			var clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				const pair = makeRequestPair({}, {
+				const pair = new RequestPair({}, {
 					path: '/foo',
 					method: 'POST',
 					headers: {Accept: 'text/plain, application/json'},

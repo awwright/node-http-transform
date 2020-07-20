@@ -6,15 +6,6 @@ var { Headers } = require('..');
 
 describe('Headers', function(){
 	describe('domain', function(){
-		it('new Headers(from)', function(){
-
-		});
-		it('pipeHeaders', function(){
-
-		});
-		it('getHeader', function(){
-
-		});
 		it('writeHead', function(){
 			const headers = new Headers;
 			assert.throws(function(){
@@ -26,9 +17,6 @@ describe('Headers', function(){
 				assert.strictEqual(err.code, 'ERR_INVALID_HTTP_TOKEN');
 				return true;
 			});
-		});
-		it('flushHeaders', function(){
-
 		});
 		it('setHeader', function(){
 			const headers = new Headers;
@@ -60,18 +48,6 @@ describe('Headers', function(){
 				assert.strictEqual(err.code, 'ERR_INVALID_HTTP_TOKEN');
 				return true;
 			});
-		});
-		it('getHeaderNames', function(){
-
-		});
-		it('getHeaders', function(){
-
-		});
-		it('hasHeader', function(){
-
-		});
-		it('toString', function(){
-
 		});
 	});
 	describe('cannot write headers after sent', function(){
