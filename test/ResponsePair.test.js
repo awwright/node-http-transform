@@ -4,9 +4,65 @@ const assert = require('assert');
 const stream = require('stream');
 const http = require('http');
 
-const { makeResponsePair } = require('..');
+const { makeResponsePair, ResponsePair } = require('..');
 
 describe('makeResponsePair', function(){
+	describe('reading headers early produces error', function(){
+		var headers;
+		beforeEach(function(){
+			const { serverWritableSide, clientReadableSide } = new ResponsePair();
+			serverWritableSide.addHeader('Link', '<http://localhost/>;rel=up');
+			headers = clientReadableSide;
+		});
+		it.skip('rawHeaders', function(){
+			assert.throws(function(){
+				return headers.rawHeaders[0];
+			}, function(err){
+				assert.match(err.toString(), /TypeError/);
+				return true;
+			});
+		});
+		it.skip('headers', function(){
+			assert.throws(function(){
+				return headers.headers['Link'];
+			}, function(err){
+				assert.match(err.toString(), /TypeError/);
+				return true;
+			});
+		});
+		it('hasHeader', function(){
+			assert.throws(function(){
+				return headers.hasHeader('Link');
+			}, function(err){
+				assert.match(err.toString(), /Headers not yet received/);
+				return true;
+			});
+		});
+		it('getHeader', function(){
+			assert.throws(function(){
+				return headers.getHeader('Link');
+			}, function(err){
+				assert.match(err.toString(), /Headers not yet received/);
+				return true;
+			});
+		});
+		it('getHeaders', function(){
+			assert.throws(function(){
+				return headers.getHeaders('Link');
+			}, function(err){
+				assert.match(err.toString(), /Headers not yet received/);
+				return true;
+			});
+		});
+		it('getHeaderNames', function(){
+			assert.throws(function(){
+				return headers.getHeaderNames('Link');
+			}, function(err){
+				assert.match(err.toString(), /Headers not yet received/);
+				return true;
+			});
+		});
+	});
 	describe('serverWritableSide', function(){
 		describe('WritableSide', function(){
 			var serverWritableSide, clientReadableSide;
