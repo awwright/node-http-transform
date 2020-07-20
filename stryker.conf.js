@@ -2,7 +2,11 @@
  * @type {import('@stryker-mutator/api/core').StrykerOptions}
  */
 module.exports = {
-	mutator: "javascript",
+	mutator: {
+		name: 'javascript',
+		plugins: ['asyncGenerators', 'bigInt', 'classProperties', 'classPrivateProperties', 'dynamicImport', 'flow', 'jsx', 'objectRestSpread'],
+		excludedMutations: ['BooleanSubstitution', 'StringLiteral']
+  },
 	packageManager: "yarn",
 	reporters: ["html", "clear-text", "progress"],
 	testRunner: "mocha",
