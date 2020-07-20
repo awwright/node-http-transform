@@ -82,6 +82,27 @@ describe('ResponsePassThrough', function(){
 					assert.strictEqual(clientReadableSide.headers['allow'], 'GET, HEAD, POST');
 				});
 			});
+			it('destroy()', function(done){
+				debugger;
+				serverWritableSide.destroy();
+				clientReadableSide.once('error', assert.fail);
+				clientReadableSide.once('close', function(){
+					done();
+				});
+			});
+			it('destroy(error)', function(done){
+				debugger;
+				var haveError;
+				serverWritableSide.destroy(new Error('Boom'));
+				clientReadableSide.once('error', function(error){
+					assert.match(error.message, /Boom/);
+					haveError = error;
+				});
+				clientReadableSide.once('close', function(){
+					assert(haveError);
+					done();
+				});
+			});
 		});
 		describe('implements OutgoingMessage', function(){
 			var serverWritableSide, clientReadableSide;
