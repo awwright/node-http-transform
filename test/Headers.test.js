@@ -95,7 +95,13 @@ describe('Headers', function(){
 			});
 		});
 		it('flushHeaders', function(){
-
+			assert.throws(function(){
+				headers.flushHeaders();
+			}, function(err){
+				assert.match(err.toString(), /Cannot set headers after they are sent to the client/);
+				assert.strictEqual(err.code, 'ERR_HTTP_HEADERS_SENT');
+				return true;
+			});
 		});
 		it('setHeader', function(){
 			assert.throws(function(){
