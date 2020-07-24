@@ -89,6 +89,30 @@ describe('Headers', function(){
 			});
 		});
 	});
+	describe('interface', function(){
+		it('new Headers({path}', function(){
+			const headers = new Headers({
+				method: 'POST',
+				path: '/foo',
+			});
+			headers._readableSide = headers;
+			headers.flushHeaders();
+			assert(headers.url, '/foo');
+			assert(headers.target, '/foo');
+			assert(headers.method, 'POST');
+		});
+		it('new Headers({target}', function(){
+			const headers = new Headers({
+				method: 'POST',
+				target: '/foo',
+			});
+			headers._readableSide = headers;
+			headers.flushHeaders();
+			assert(headers.url, '/foo');
+			assert(headers.target, '/foo');
+			assert(headers.method, 'POST');
+		});
+	});
 	describe('cannot write headers after sent', function(){
 		var headers;
 		beforeEach(function(){
