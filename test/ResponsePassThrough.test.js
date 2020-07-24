@@ -4,9 +4,20 @@ const assert = require('assert');
 const stream = require('stream');
 const http = require('http');
 
-const { ResponsePassThrough } = require('..');
+const { ResponsePassThrough, Headers } = require('..');
 
 describe('ResponsePassThrough', function(){
+	describe('interface', function(){
+		it('copy from Headers', function(){
+			const h = new Headers;
+			h._readableSide = h;
+			h.addHeader('Foo', 'Bar');
+			h.flushHeaders();
+			const pair = new ResponsePassThrough(h);
+			pair.flushHeaders();
+			assert.strictEqual(pair.readableSide.headers['foo'], 'Bar');
+		});
+	});
 	function describePermutations(title, body){
 		describe('passthrough → passthrough', function(){
 			body(function(opts){

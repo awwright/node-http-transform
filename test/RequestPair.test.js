@@ -140,7 +140,7 @@ describe('RequestPair', function(){
 		describe('ReadableSide', function(){
 			var clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				const pair = new RequestPair({}, {
+				const pair = new RequestPair({
 					path: '/foo',
 					method: 'POST',
 					headers: {Accept: 'text/plain, application/json'},
@@ -190,7 +190,7 @@ describe('RequestPair', function(){
 		describe('instanceof IncomingMessage', function(){
 			var clientWritableSide, serverReadableSide;
 			beforeEach(function(){
-				const pair = new RequestPair({}, {
+				const pair = new RequestPair({
 					path: '/foo',
 					method: 'POST',
 					headers: {Accept: 'text/plain, application/json'},
