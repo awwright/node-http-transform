@@ -6,6 +6,45 @@ var { Headers } = require('..');
 
 describe('Headers', function(){
 	describe('domain', function(){
+		it('new Headers (object form)', function(){
+			assert.throws(function(){
+				new Headers({
+					statusCode: 405,
+					statusMessage: 'Method Not Allowed',
+					headers: { ' Allow': 'GET, POST' },
+				});
+			}, function(err){
+				assert.match(err.toString(), /Header name must be a valid HTTP token/);
+				assert.strictEqual(err.code, 'ERR_INVALID_HTTP_TOKEN');
+				return true;
+			});
+		});
+		it('new Headers (array form)', function(){
+			assert.throws(function(){
+				new Headers({
+					statusCode: 405,
+					statusMessage: 'Method Not Allowed',
+					headers: [ [' Allow', 'GET, POST'] ],
+				});
+			}, function(err){
+				assert.match(err.toString(), /Header name must be a valid HTTP token/);
+				assert.strictEqual(err.code, 'ERR_INVALID_HTTP_TOKEN');
+				return true;
+			});
+		});
+		it('new Headers (rawHeaders form)', function(){
+			assert.throws(function(){
+				new Headers({
+					statusCode: 405,
+					statusMessage: 'Method Not Allowed',
+					rawHeaders: [' Allow', 'GET, POST'],
+				});
+				}, function(err){
+				assert.match(err.toString(), /Header name must be a valid HTTP token/);
+				assert.strictEqual(err.code, 'ERR_INVALID_HTTP_TOKEN');
+				return true;
+			});
+		});
 		it('writeHead', function(){
 			const headers = new Headers;
 			assert.throws(function(){

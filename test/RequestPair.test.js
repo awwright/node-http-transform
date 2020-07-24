@@ -17,11 +17,13 @@ describe('RequestPair', function(){
 			it('addHeader()', function (){
 				clientWritableSide.addHeader('Link', '<http://example.com/>;rel=up');
 				clientWritableSide.addHeader('Link', '<http://example.com/page/2>;rel=next');
+				clientWritableSide.addHeader('Link', '<http://example.com/page/0>;rel=prev');
 				clientWritableSide.flushHeaders();
 				return serverReadableSide.headersReady.then(function(){
 					assert.strictEqual(serverReadableSide.headers['link'][0], '<http://example.com/>;rel=up');
 					assert.strictEqual(serverReadableSide.headers['link'][1], '<http://example.com/page/2>;rel=next');
-					assert.strictEqual(serverReadableSide.headers['link'].length, 2);
+					assert.strictEqual(serverReadableSide.headers['link'][2], '<http://example.com/page/0>;rel=prev');
+					assert.strictEqual(serverReadableSide.headers['link'].length, 3);
 				});
 			});
 		});
