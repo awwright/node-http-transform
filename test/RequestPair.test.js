@@ -113,7 +113,7 @@ describe('RequestPair', function(){
 				clientWritableSide.end('Content\r\n');
 
 				const pipe = new RequestPair();
-				serverReadableSide.pipe(pipe.clientWritableSide);
+				serverReadableSide.pipeMessage(pipe.clientWritableSide);
 
 				var data = '';
 				pipe.serverReadableSide.setEncoding('UTF-8');
@@ -234,8 +234,44 @@ describe('RequestPair', function(){
 			it('destroy(error)');
 		});
 		describe('implements Readable', function(){
+			var clientWritableSide, serverReadableSide;
+			beforeEach(function(){
+				const pair = new RequestPair({
+					path: '/foo',
+					method: 'POST',
+					headers: {Accept: 'text/plain, application/json'},
+				});
+				serverReadableSide = pair.serverReadableSide;
+				clientWritableSide = pair.clientWritableSide;
+				clientWritableSide.end('Content\r\n');
+			});
 			it('destroy()');
-			it('pipe()');
+			it('pipe()', function(done){
+				const through = new RequestPair();
+				serverReadableSide.pipe(through.clientWritableSide);
+
+				var data = '';
+				through.serverReadableSide.setEncoding('UTF-8');
+				through.serverReadableSide.on('headers', function(){
+					assert.strictEqual(through.serverReadableSide, this);
+					assert.strictEqual(this.url, '');
+					assert.strictEqual(this.method, null);
+					assert.strictEqual(this.headers['accept'], undefined);
+				});
+				through.serverReadableSide.on('readable', function(){
+					assert.strictEqual(through.serverReadableSide, this);
+					for(var s; null !== (s=this.read());) data += s;
+				});
+				through.serverReadableSide.on('end', function(){
+					assert.strictEqual(through.serverReadableSide, this);
+					assert.strictEqual(this.url, '');
+					assert.strictEqual(this.method, null);
+					assert.strictEqual(this.headers['accept'], undefined);
+					assert.strictEqual(data, 'Content\r\n');
+					done();
+				});
+
+			});
 			it('pause()');
 			it('resume()');
 		});
