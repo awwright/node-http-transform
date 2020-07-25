@@ -95,7 +95,6 @@ describe('Headers', function(){
 				method: 'POST',
 				path: '/foo',
 			});
-			headers._readableSide = headers;
 			headers.flushHeaders();
 			assert(headers.url, '/foo');
 			assert(headers.target, '/foo');
@@ -106,7 +105,6 @@ describe('Headers', function(){
 				method: 'POST',
 				target: '/foo',
 			});
-			headers._readableSide = headers;
 			headers.flushHeaders();
 			assert(headers.url, '/foo');
 			assert(headers.target, '/foo');
@@ -117,8 +115,6 @@ describe('Headers', function(){
 		var headers;
 		beforeEach(function(){
 			headers = new Headers;
-			headers._readableSide = headers;
-			headers._readableSide._readyCallback = function(){};
 			headers.addHeader('Link', '<http://localhost/>;rel=up');
 			headers.flushHeaders();
 		});
