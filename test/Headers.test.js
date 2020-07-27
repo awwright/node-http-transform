@@ -201,6 +201,46 @@ describe('Headers', function(){
 					'Content-Type', 'text/plain',
 				]);
 			});
+			it('setHeader (0)', function(){
+				headers.setHeader('Foo', 'bar');
+				headers.flushHeaders();
+				assert.deepStrictEqual(headers.rawHeaders, [
+					'ETag', '"0"',
+					'link', '<http://example.com/0>',
+					'link', '<http://example.com/1>',
+					'Last-Modified', 'Mon, 27 Jul 2020 00:55:47 GMT',
+					'Link', '<http://example.com/2>',
+					'LINK', '<http://example.com/3>',
+					'LINK', '<http://example.com/4>',
+					'Content-Type', 'text/plain',
+					'Foo', 'bar',
+				]);
+			});
+			it('setHeader (1)', function(){
+				headers.setHeader('ETag', '"1"');
+				headers.flushHeaders();
+				assert.deepStrictEqual(headers.rawHeaders, [
+					'ETag', '"1"',
+					'link', '<http://example.com/0>',
+					'link', '<http://example.com/1>',
+					'Last-Modified', 'Mon, 27 Jul 2020 00:55:47 GMT',
+					'Link', '<http://example.com/2>',
+					'LINK', '<http://example.com/3>',
+					'LINK', '<http://example.com/4>',
+					'Content-Type', 'text/plain',
+				]);
+			});
+			it('setHeader (1)', function(){
+				headers.setHeader('Link', '<http://example.com/0>');
+				headers.flushHeaders();
+				// These may be rearranged if necessary
+				assert.deepStrictEqual(headers.rawHeaders, [
+					'ETag', '"0"',
+					'Last-Modified', 'Mon, 27 Jul 2020 00:55:47 GMT',
+					'Content-Type', 'text/plain',
+					'Link', '<http://example.com/0>',
+				]);
+			});
 		});
 	});
 	describe('cannot write headers after sent', function(){
