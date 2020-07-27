@@ -205,7 +205,7 @@ describe('ResponsePair', function(){
 			});
 			it('pipeHeaders()', function(done){
 				const through = new ResponsePair();
-				clientReadableSide.pipeMessage(through.serverWritableSide);
+				clientReadableSide.pipeHeaders(through.serverWritableSide);
 				through.clientReadableSide.setEncoding('UTF-8');
 				through.clientReadableSide.on('headers', function(){
 					assert(through.clientReadableSide === this);
@@ -214,6 +214,7 @@ describe('ResponsePair', function(){
 					assert.strictEqual(this.headers['allow'], 'GET, HEAD, POST');
 					done();
 				});
+				through.serverWritableSide.end();
 			});
 			it('pipeMessage()', function(done){
 				const pipe = new ResponsePair();

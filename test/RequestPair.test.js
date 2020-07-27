@@ -151,7 +151,7 @@ describe('RequestPair', function(){
 			});
 			it('pipeHeaders()', function(done){
 				const through = new RequestPair();
-				serverReadableSide.pipeMessage(through.clientWritableSide);
+				serverReadableSide.pipeHeaders(through.clientWritableSide);
 				through.serverReadableSide.setEncoding('UTF-8');
 				through.serverReadableSide.on('headers', function(){
 					assert(through.serverReadableSide === this);
@@ -160,6 +160,7 @@ describe('RequestPair', function(){
 					assert.strictEqual(this.headers['accept'], 'text/plain, application/json');
 					done();
 				});
+				through.clientWritableSide.end();
 			});
 			it('pipeMessage()', function(done){
 				const through = new RequestPair();
