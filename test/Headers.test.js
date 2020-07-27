@@ -110,6 +110,98 @@ describe('Headers', function(){
 			assert(headers.target, '/foo');
 			assert(headers.method, 'POST');
 		});
+		describe('removeHeader', function(){
+			var headers;
+			beforeEach(function(){
+				headers = new Headers({
+					headers: [
+						['ETag', '"0"'],
+						['link', '<http://example.com/0>'],
+						['link', '<http://example.com/1>'],
+						['Last-Modified', 'Mon, 27 Jul 2020 00:55:47 GMT'],
+						['Link', '<http://example.com/2>'],
+						['LINK', '<http://example.com/3>'],
+						['LINK', '<http://example.com/4>'],
+						['Content-Type', 'text/plain'],
+					],
+				});
+			});
+			it('removeHeader (0)', function(){
+				headers.flushHeaders();
+				assert.deepStrictEqual(headers.rawHeaders, [
+					'ETag', '"0"',
+					'link', '<http://example.com/0>',
+					'link', '<http://example.com/1>',
+					'Last-Modified', 'Mon, 27 Jul 2020 00:55:47 GMT',
+					'Link', '<http://example.com/2>',
+					'LINK', '<http://example.com/3>',
+					'LINK', '<http://example.com/4>',
+					'Content-Type', 'text/plain',
+				]);
+			});
+			it('removeHeader (1)', function(){
+				headers.removeHeader('ETag');
+				headers.flushHeaders();
+				assert.deepStrictEqual(headers.rawHeaders, [
+					'link', '<http://example.com/0>',
+					'link', '<http://example.com/1>',
+					'Last-Modified', 'Mon, 27 Jul 2020 00:55:47 GMT',
+					'Link', '<http://example.com/2>',
+					'LINK', '<http://example.com/3>',
+					'LINK', '<http://example.com/4>',
+					'Content-Type', 'text/plain',
+				]);
+			});
+			it('removeHeader (2)', function(){
+				headers.removeHeader('Link');
+				headers.flushHeaders();
+				assert.deepStrictEqual(headers.rawHeaders, [
+					'ETag', '"0"',
+					'Last-Modified', 'Mon, 27 Jul 2020 00:55:47 GMT',
+					'Content-Type', 'text/plain',
+				]);
+			});
+			it('removeHeader (3)', function(){
+				headers.removeHeader('Last-Modified');
+				headers.flushHeaders();
+				assert.deepStrictEqual(headers.rawHeaders, [
+					'ETag', '"0"',
+					'link', '<http://example.com/0>',
+					'link', '<http://example.com/1>',
+					'Link', '<http://example.com/2>',
+					'LINK', '<http://example.com/3>',
+					'LINK', '<http://example.com/4>',
+					'Content-Type', 'text/plain',
+				]);
+			});
+			it('removeHeader (4)', function(){
+				headers.removeHeader('Content-Type');
+				headers.flushHeaders();
+				assert.deepStrictEqual(headers.rawHeaders, [
+					'ETag', '"0"',
+					'link', '<http://example.com/0>',
+					'link', '<http://example.com/1>',
+					'Last-Modified', 'Mon, 27 Jul 2020 00:55:47 GMT',
+					'Link', '<http://example.com/2>',
+					'LINK', '<http://example.com/3>',
+					'LINK', '<http://example.com/4>',
+				]);
+			});
+			it('removeHeader (3)', function(){
+				headers.removeHeader('Foo');
+				headers.flushHeaders();
+				assert.deepStrictEqual(headers.rawHeaders, [
+					'ETag', '"0"',
+					'link', '<http://example.com/0>',
+					'link', '<http://example.com/1>',
+					'Last-Modified', 'Mon, 27 Jul 2020 00:55:47 GMT',
+					'Link', '<http://example.com/2>',
+					'LINK', '<http://example.com/3>',
+					'LINK', '<http://example.com/4>',
+					'Content-Type', 'text/plain',
+				]);
+			});
+		});
 	});
 	describe('cannot write headers after sent', function(){
 		var headers;
